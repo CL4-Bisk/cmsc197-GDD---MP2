@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://bxssmqs7ag6is"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_tcuxl"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_tcuxl"]
+size = Vector2(50, 77)
+
+[node name="NPC" type="CharacterBody2D" unique_id=865495043]
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1223765970]
+sprite_frames = SubResource("SpriteFrames_tcuxl")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1894364261]
+position = Vector2(15, 28.5)
+shape = SubResource("RectangleShape2D_tcuxl")
+
+[node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="." unique_id=2010432307]
