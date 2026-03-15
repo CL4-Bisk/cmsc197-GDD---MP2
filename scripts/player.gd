@@ -1,137 +1,93 @@
 extends CharacterBody2D
-class_name Player
 
-const SPEED: float = 250.0
+const BASE_SPEED: float = 250.0
 
-signal start_game
-signal player_out
-signal player_levelup(level: int)
-signal health_changed
+@onready var sprite: Sprite2D = $Sprite2D
+@onready var charm_aura: Area2D = $CharmAura          # circle Area2D, radius = charm_radius
+@onready var charm_shape: CollisionShape2D = $CharmAura/CollisionShape2D
+@onready var lure: Ability = $Ability
+@onready var anim: AnimationPlayer = $AnimationPlayer
 
-@export_category("Player Values")
-@export var health_max := 100
-@export var stamina_max := 100
-@export var power_base := 25
-
-var screensize := Vector2.ZERO
-var health : int
-var is_alive := true
-var level := 0
-var xp := 0
-var xp_per_level := 10
-var power := 10
-
-var player_condition : PlayerStatus
-enum PlayerStatus {
-	IDLE,
-	NORMAL,
-	EXPLOITED,
-	DEAD
-}
-
-@onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
-@onready var hitbox: CollisionShape2D = $CollisionShape2D
-@onready var health_timer: Timer = $Health
-@onready var stamina_timer: Timer = $Stamina
-@onready var exp_timer: Timer = $Exp
-@onready var eat_area: Area2D = $EatArea
+var aura_bodies: Array = []   # prey currently inside aura
 
 func _ready() -> void:
-	eat_area.body_entered.connect(_on_eat_area_body_entered)
-	exp_timer.timeout.connect(gain_exp)
-	health_timer.timeout.connect(func(): health = clamp(health + 0.3, 0, health_max))
-	reset()
+	add_to_group("player")
+	charm_aura.body_entered.connect(_on_aura_entered)
+	charm_aura.body_exited.connect(_on_aura_exited)
+	GameData.power_changed.connect(_on_power_changed)
+	GameData.level_changed.connect(_on_level_up)
+	_update_aura_radius()
 
 func _physics_process(delta: float) -> void:
-	var dir := Vector2.ZERO
-	
-	var mouse_pos := get_global_mouse_position()
-	dir = (mouse_pos - global_position)
-	if dir.length() > 10.0:
-		velocity = dir.normalized() * SPEED
+	_handle_movement()
+	_tick_aura(delta)
+	_handle_input()
+
+func _handle_movement() -> void:
+	var mouse := get_global_mouse_position()
+	var dir := mouse - global_position
+	if dir.length() > 8.0:
+		velocity = dir.normalized() * BASE_SPEED
+		sprite.flip_h = velocity.x < 0
 	else:
 		velocity = Vector2.ZERO
-	
-	if velocity.x < 0:
-		sprite.flip_h = true
-	elif velocity.x > 0:
-		sprite.flip_h = false
-	
 	move_and_slide()
-	_clamp_to_screen()
-
-func _clamp_to_screen() -> void:
 	var vp := get_viewport_rect()
-	global_position.x = clamp(global_position.x, 0, vp.size.x)
-	global_position.y = clamp(global_position.y, 0, vp.size.y)
+	global_position = global_position.clamp(Vector2.ZERO, vp.size)
 
-func _on_eat_area_body_entered(body: Node2D) -> void:
-	if body.is_in_group("npc"):
-		var npc := body as NPC
-#		continuation
+func _tick_aura(delta: float) -> void:
+	for body in aura_bodies:
+		if is_instance_valid(body) and body.is_in_group("prey"):
+			lure.on_prey_in_aura_tick(body, delta)
 
+func _handle_input() -> void:
+	# Q → Cast Charm
+	if Input.is_action_just_pressed("cast_charm"):
+		lure.cast_charm(aura_bodies)
+	# Right-click → Place dark zone trap at mouse pos
+	if Input.is_action_just_pressed("place_trap"):
+		lure.place_dark_zone_trap(get_global_mouse_position())
+	# E near prey → start dialogue
+	if Input.is_action_just_pressed("interact"):
+		var closest := _get_closest_prey(100.0)
+		if closest:
+			lure.start_dialogue(closest)
 
-func can_move() -> void:
-	if !is_alive: return
-	player_condition = PlayerStatus.NORMAL
+func _on_aura_entered(body: Node2D) -> void:
+	if body.is_in_group("prey"):
+		aura_bodies.append(body)
+		lure.on_prey_entered_aura(body)
+	elif body.is_in_group("enemy_succubus"):
+		_check_rivalry_collision(body)
 
-func reset() -> void:
-	player_condition = PlayerStatus.IDLE
-	collision_layer = 1
-	collision_mask = 2
-	
-	level = 1
-	xp = 0
-	xp_per_level = 10
-	health_max = 100
-	health = health_max
-	power = power_base
-	
-	is_alive = true
-	velocity = Vector2.ZERO
-	position = screensize/2
-	sprite.play("idle")
-	hitbox.call_deferred("set_disabled", false)
+func _on_aura_exited(body: Node2D) -> void:
+	aura_bodies.erase(body)
 
-func gain_exp() -> void:
-	xp += 1
-	if xp >= xp_per_level:
-		level = min(level + 1, 15)
-		xp = 0
-		xp_per_level += (5 * level)
-		player_levelup.emit(level)
-		exp_timer.start()
-		health_max += 10
-		health += 10
-		power += 10
-	if level >= 15: 
-		exp_timer.stop()
+func _check_rivalry_collision(enemy: Node2D) -> void:
+	if GameData.power > enemy.power:
+		enemy.get_defeated_by_player()
+	else:
+		# Player is weaker — pushed back
+		var knockback := (global_position - enemy.global_position).normalized() * 300
+		velocity += knockback
 
-func damage(value : float) -> void:
-	var tween = create_tween()
-	tween.tween_property(sprite, "modulate", Color.DIM_GRAY, 0.05)
-	tween.tween_property(sprite, "modulate", Color.WHITE, 0.1)
-	
-	health = clamp(health - value, 0, health_max)
-	health_changed.emit(health, health_max)
-	
-	if health <= 0:
-		stop()
+func _on_power_changed(p: float) -> void:
+	_update_aura_radius()
 
-func stop() -> void:
-	if !is_alive : return
-	player_condition = PlayerStatus.DEAD
-	is_alive = false
-	health = 0
-	exp_timer.stop()
-	health_timer.stop()
-	#anim.play("die")
-	
-	velocity = Vector2.ZERO
-	#bird_ded.emit() 
-	#await anim.animation_finished
-	#anim.play("dead")
-	get_tree().create_tween().kill()
+func _on_level_up(l: int) -> void:
+	anim.play("level_up")
 
-func _on_exit() -> void:
-	stop()
+func _update_aura_radius() -> void:
+	if charm_shape.shape is CircleShape2D:
+		charm_shape.shape.radius = GameData.charm_radius
+
+func _get_closest_prey(max_dist: float) -> Node2D:
+	var closest: Node2D = null
+	var best := max_dist
+	for body in aura_bodies:
+		if not is_instance_valid(body) or not body.is_in_group("prey"):
+			continue
+		var d := global_position.distance_to(body.global_position)
+		if d < best:
+			best = d; closest = body
+	return closest

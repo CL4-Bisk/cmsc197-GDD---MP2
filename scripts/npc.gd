@@ -9,7 +9,6 @@ enum Behavior {
 	IDLE
 }
 
-@export var npc_size: float = 1.0
 @export var speed: float = 100.0
 @export var score_value: int = 10
 @export var behavior: Behavior = Behavior.NORMAL
@@ -20,7 +19,7 @@ enum Behavior {
 var direction: Vector2 = Vector2.LEFT
 
 func _ready() -> void:
-	add_to_group("npc")
+	add_to_group("prey")
 	screen_notifier.screen_exited.connect(_on_screen_exited)
 	
 	var vp := get_viewport_rect()
@@ -35,9 +34,6 @@ func _ready() -> void:
 	move_and_slide()
 
 func _flee_from_player() -> void:
-	
-
-func _chase_player() -> void:
 	
 
 func _swayed_from_player() -> void:

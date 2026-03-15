@@ -14,6 +14,10 @@ config/name="Machine Problem 2"
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://icon.svg"
 
+[autoload]
+
+GameData="*uid://bpqnyit5oe07f"
+
 [dotnet]
 
 project/assembly_name="Machine Problem 2"

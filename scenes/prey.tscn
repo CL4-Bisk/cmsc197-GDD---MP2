@@ -5,7 +5,7 @@
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_tcuxl"]
 size = Vector2(50, 77)
 
-[node name="NPC" type="CharacterBody2D" unique_id=865495043]
+[node name="Prey" type="CharacterBody2D" unique_id=865495043]
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1223765970]
 sprite_frames = SubResource("SpriteFrames_tcuxl")
