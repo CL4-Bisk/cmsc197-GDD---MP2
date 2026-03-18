@@ -1,0 +1,37 @@
+[gd_scene format=3 uid="uid://cqahyngji4y73"]
+
+[ext_resource type="Script" uid="uid://coby3lu0gb1p0" path="res://scripts/EnemySuccubus.gd" id="1_nlecq"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_e7u2n"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_mf7md"]
+radius = 100.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_oegdf"]
+radius = 200.0
+
+[node name="EnemySuccubus" type="CharacterBody2D" unique_id=865495043 groups=["enemy_succubus"]]
+collision_layer = 4
+collision_mask = 3
+script = ExtResource("1_nlecq")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1452080278]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1894364261]
+position = Vector2(15, 28.5)
+shape = SubResource("CapsuleShape2D_e7u2n")
+
+[node name="RivalAura" type="Area2D" parent="." unique_id=215562529]
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RivalAura" unique_id=2130485824]
+shape = SubResource("CircleShape2D_mf7md")
+
+[node name="TerritoryArea" type="Area2D" parent="." unique_id=1842639107]
+collision_layer = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="TerritoryArea" unique_id=729969677]
+shape = SubResource("CircleShape2D_oegdf")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1325077198]

@@ -1,0 +1,81 @@
+[gd_scene format=3 uid="uid://cvtfwpvxyhw17"]
+
+[node name="HUD" type="CanvasLayer" unique_id=496130557]
+
+[node name="Control" type="Control" parent="." unique_id=1903386570]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Bar" type="ProgressBar" parent="Control" unique_id=1950233419]
+layout_mode = 0
+offset_left = 43.0
+offset_top = 14.0
+offset_right = 47.0
+offset_bottom = 41.0
+
+[node name="PowerLabel" type="Label" parent="Control" unique_id=1882198386]
+layout_mode = 0
+offset_left = 113.0
+offset_top = 15.0
+offset_right = 189.0
+offset_bottom = 38.0
+text = "Power: 10"
+
+[node name="LevelLabel" type="Label" parent="Control" unique_id=920378237]
+layout_mode = 0
+offset_left = 121.0
+offset_top = 111.0
+offset_right = 179.0
+offset_bottom = 134.0
+text = "Level: 1"
+
+[node name="ScoreLabel" type="Label" parent="Control" unique_id=1126207381]
+layout_mode = 0
+offset_left = 5.0
+offset_top = 55.0
+offset_right = 66.0
+offset_bottom = 78.0
+text = "Score: 0"
+
+[node name="Lives" type="HBoxContainer" parent="Control" unique_id=431148758]
+layout_mode = 0
+offset_left = 36.0
+offset_right = 76.0
+offset_bottom = 40.0
+
+[node name="Heart1" type="TextureRect" parent="Control/Lives" unique_id=1074815084]
+layout_mode = 2
+
+[node name="Heart2" type="TextureRect" parent="Control/Lives" unique_id=835613559]
+layout_mode = 2
+
+[node name="Heart3" type="TextureRect" parent="Control/Lives" unique_id=1569196091]
+layout_mode = 2
+
+[node name="AbilityCooldown" type="ProgressBar" parent="Control" unique_id=1163610783]
+layout_mode = 0
+offset_left = 104.0
+offset_top = 39.0
+offset_right = 108.0
+offset_bottom = 66.0
+max_value = 5.0
+
+[node name="TrapCooldown" type="ProgressBar" parent="Control" unique_id=471539320]
+layout_mode = 0
+offset_left = 47.0
+offset_top = 171.0
+offset_right = 51.0
+offset_bottom = 198.0
+max_value = 12.0
+
+[node name="Progress" type="ProgressBar" parent="Control" unique_id=55305826]
+layout_mode = 0
+offset_left = 276.0
+offset_top = 45.0
+offset_right = 280.0
+offset_bottom = 72.0
+max_value = 3.0

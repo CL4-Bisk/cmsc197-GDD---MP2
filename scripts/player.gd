@@ -3,7 +3,7 @@ extends CharacterBody2D
 const BASE_SPEED: float = 250.0
 
 @onready var sprite: Sprite2D = $Sprite2D
-@onready var charm_aura: Area2D = $CharmAura          # circle Area2D, radius = charm_radius
+@onready var charm_aura: Area2D = $CharmAura
 @onready var charm_shape: CollisionShape2D = $CharmAura/CollisionShape2D
 @onready var lure: Ability = $Ability
 @onready var anim: AnimationPlayer = $AnimationPlayer
