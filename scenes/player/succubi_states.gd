@@ -53,6 +53,7 @@ class Feeding extends GameState:
 		state_name = "feed"
 	
 	func start() -> String:
+		handler.anim.play("feed")
 		handler.state_machine.refresh()
 		handler.spd_mult = 0
 		handler.hit_box.set_deferred("disabled", true)

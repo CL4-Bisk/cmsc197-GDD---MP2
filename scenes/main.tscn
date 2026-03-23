@@ -8,15 +8,15 @@ normal = Vector2(0, 1)
 
 [node name="Main" type="Node2D" unique_id=80636501]
 
-[node name="Camera2D" type="Camera2D" parent="." unique_id=1659175770]
-scale = Vector2(1.5, 1.5)
+[node name="NPC" parent="." unique_id=1043865114 instance=ExtResource("1_cmejp")]
+position = Vector2(-5, 4)
+
+[node name="Camera2D" type="Camera2D" parent="NPC" unique_id=1659175770]
+position = Vector2(3.3333335, -2.6666667)
 limit_enabled = false
 limit_smoothed = true
 position_smoothing_enabled = true
 position_smoothing_speed = 2.0
-
-[node name="NPC" parent="." unique_id=1043865114 instance=ExtResource("1_cmejp")]
-position = Vector2(-5, 4)
 
 [node name="Player" parent="." unique_id=1028600786 instance=ExtResource("2_jvcog")]
 position = Vector2(-402, -228)
