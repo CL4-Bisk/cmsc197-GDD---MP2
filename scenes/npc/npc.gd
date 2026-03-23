@@ -17,7 +17,6 @@ class_name NPC
 @onready var comfort: Area2D = $Comfort
 @onready var c_zone: CollisionShape2D = $Comfort/Zone
 @onready var sensitive: Area2D = $Sensitive
-@onready var path: Line2D = $Path
 @onready var check: RayCast2D = $Check
 
 @export_category("Dynamic Parameters")
@@ -72,34 +71,33 @@ func _physics_process(_delta: float) -> void:
 	print(state_machine.stack.map(func(x): return x.state_name))
 	
 	if state_machine.current() and state_machine.current().state_name == "struggle": return
-	if velocity.length() > 0:
-		anim.play("run")
-	else:
-		anim.play("idle")
-
-func _toggle_zone(zone: Area2D, enabled: bool) -> void:
-	zone.monitoring = enabled
+	if velocity.length() <= 1: anim.play("idle")
+	else: anim.play("run")
 
 func toggle_zones(enabled: bool, ... zones: Array) -> void:
 	for z in zones:
 		if z is not Area2D: continue
-		_toggle_zone(z, enabled)
+		z.monitoring = enabled
 
 func _is_path_clear(destination: Vector2) -> bool:
 	check.target_position = destination
 	check.force_raycast_update()
 	return not check.is_colliding()
 
-func pick_destination(radius: float = 100.0, target_pos: Vector2 = Vector2.ZERO, flee: bool = true) -> Vector2:
-	var angle : float
+func pick_destination(
+	max_distance: float,
+	min_distance: float = 0.0,
+	target_pos: Vector2 = Vector2.ZERO,
+	flee: bool = true) -> Vector2:
+	
+	var angle : float = randf() * TAU
 	if target_pos:
-		var dir = (target_pos - global_position).angle() + (PI if flee else 0.0)
+		var dir = (target_pos - global_position).angle()
+		if flee: dir += PI
 		angle = dir + randf_range(-PI/4, PI/4)
-	else:
-		angle = randf() * TAU
-	var distance = radius * sqrt(randf())
-	var pot = Vector2.from_angle(angle) * distance
-	return pot if _is_path_clear(pot) else pick_destination(radius, target_pos, flee)
+	var distance = ((max_distance - min_distance) * sqrt(randf())) + min_distance
+	var offset = Vector2.from_angle(angle) * distance
+	return offset if _is_path_clear(offset) else pick_destination(max_distance, min_distance, target_pos, flee)
 
 func modify_vigilance(amount: float) -> void:
 	vigilance = max(0, vigilance + amount)
@@ -115,15 +113,15 @@ func update_indicators() -> void:
 	vigilance_ind.text = str(ceili(vigilance))
 	life_force_ind.text = str(ceili(life_force))
 
-func move_towards(target_pos: Variant) -> void:
-	var t : Vector2 = target_pos if target_pos is Vector2 else target_pos.global_position
+func move_towards(target_pos: Vector2) -> void:
+	var dis := global_position.distance_to(target_pos)
+	var dir := global_position.direction_to(target_pos)
 	
-	var dir := global_position.direction_to(t)
-	path.clear_points()
-	path.add_point(Vector2.ZERO)
-	path.add_point(to_local(t))
+	var arrival_mult = clamp(dis / 100.0, 0, 1.0)
 	
-	velocity = velocity.lerp(dir * move_speed * spd_mult, 0.1)
+	check.target_position = to_local(target_pos)
+	var tar_vel = dir * move_speed * spd_mult * arrival_mult
+	velocity = velocity.lerp(tar_vel, 0.1)
 	sprite.flip_h = dir.x < 0
 
 func receive_charm(amount: float) -> void:
@@ -146,20 +144,18 @@ func initiate_chase(body: Node2D) -> void:
 			state_machine.change("chase")
 
 func flee_from(body: Node2D) -> void:
-	if body != self:
-		offender = body
-		var top = state_machine.current()
-		if not top: return
-		
-		# check if already fleeing
-		match top.state_name:
-			"flee":
-				top.begin()
-			"husk", "struggle":
-				return
-			_:
-				state_machine.clear()
-				state_machine.change("flee")
+	if body == self: return
+	offender = body
+	var top = state_machine.current()
+	if not top: return
+	
+	# check if already fleeing
+	match top.state_name:
+		"flee": top.begin()
+		"husk", "struggle": return
+		_:
+			state_machine.clear()
+			state_machine.change("flee")
 
 func reduce_vigilance() -> void:
 	modify_vigilance(-(2 * reduc_rate))
@@ -175,12 +171,12 @@ func _finish_idling() -> void:
 	state_machine.change("wander")
 
 func _on_detection_body_entered(body: Node2D) -> void:
-	if body is Succubus:
+	if body is Player:
 		match behavior:
 			Behavior.TERRIFIED: flee_from(body)
 			var n when n <= Behavior.DULLED: initiate_chase(body)
 
 func _on_comfort_body_exited(body: Node2D) -> void:
-	if body is Succubus:
+	if body is Player:
 		match behavior:
 			var n when n <= Behavior.DULLED: initiate_chase(body)

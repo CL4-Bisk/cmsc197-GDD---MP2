@@ -2,7 +2,7 @@ extends RefCounted
 class_name SucccubiStates
 
 class Normal extends GameState:
-	var handler : Succubus
+	var handler : Player
 	
 	func _init() -> void:
 		state_name = "normal"
@@ -17,7 +17,7 @@ class Normal extends GameState:
 		return ""
 
 class Charming extends GameState:
-	var handler : Succubus
+	var handler : Player
 	var t : Tween
 	
 	func _init() -> void:
@@ -45,7 +45,7 @@ class Charming extends GameState:
 		(handler.charm_zone.shape as CircleShape2D).radius = handler.total_life_force
 
 class Feeding extends GameState:
-	var handler : Succubus
+	var handler : Player
 	var feeding_target : NPC
 	var t: Tween
 	
@@ -92,7 +92,7 @@ class Feeding extends GameState:
 		handler.hit_box.set_deferred("disabled", false)
 
 class Lustful extends GameState:
-	var handler : Succubus
+	var handler : Player
 	
 	func _init() -> void:
 		state_name = "lust"
@@ -102,7 +102,7 @@ class Lustful extends GameState:
 			return ""
 
 class Subjugated extends GameState:
-	var handler : Succubus
+	var handler : Player
 	
 	func _init() -> void:
 		state_name = "dead"

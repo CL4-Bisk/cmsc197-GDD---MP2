@@ -1,5 +1,5 @@
 extends CharacterBody2D
-class_name Succubus
+class_name Player
 
 @onready var state_machine: GameStateMachine = $StateMachine
 @onready var charm_zone: CollisionShape2D = $Charm/Zone
@@ -33,6 +33,7 @@ func _ready() -> void:
 	state_machine._process_pending()
 
 func _physics_process(_delta: float) -> void:
+	check.target_position = to_local(get_global_mouse_position())
 	match state_machine.current().state_name:
 		"feed", "dead":
 			velocity = Vector2.ZERO
