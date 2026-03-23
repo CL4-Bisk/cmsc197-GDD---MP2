@@ -1,0 +1,218 @@
+[gd_scene format=3 uid="uid://0vtdhdrxcgxi"]
+
+[ext_resource type="Script" uid="uid://drkmknxy1l0g0" path="res://revised/npc/npc.gd" id="1_0lqhn"]
+[ext_resource type="Script" uid="uid://d0injnhv64s4a" path="res://revised/state_machine.gd" id="2_41bpm"]
+[ext_resource type="Texture2D" uid="uid://dcwja301mrl4e" path="res://assets/player_sheet.png" id="3_hjpoh"]
+
+[sub_resource type="Animation" id="Animation_vmepk"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [7]
+}
+
+[sub_resource type="Animation" id="Animation_8yqb7"]
+resource_name = "feed"
+length = 0.2
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [3, 4]
+}
+
+[sub_resource type="Animation" id="Animation_q4x0c"]
+resource_name = "idle"
+length = 0.4
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.4),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [7, 10]
+}
+
+[sub_resource type="Animation" id="Animation_paujj"]
+resource_name = "run"
+length = 0.5
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [13, 18]
+}
+
+[sub_resource type="Animation" id="Animation_0lqhn"]
+resource_name = "struggle"
+length = 0.2
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [5, 6]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_0lqhn"]
+_data = {
+&"RESET": SubResource("Animation_vmepk"),
+&"feed": SubResource("Animation_8yqb7"),
+&"idle": SubResource("Animation_q4x0c"),
+&"run": SubResource("Animation_paujj"),
+&"struggle": SubResource("Animation_0lqhn")
+}
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_cqiqx"]
+radius = 7.0
+height = 22.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_hjpoh"]
+radius = 200.0
+
+[sub_resource type="LabelSettings" id="LabelSettings_0lqhn"]
+font_size = 8
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_paujj"]
+radius = 74.06078
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_41bpm"]
+radius = 48.06506
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_0lqhn"]
+radius = 18.110771
+
+[node name="NPC" type="CharacterBody2D" unique_id=1043865114]
+scale = Vector2(1.5, 1.5)
+collision_layer = 4
+collision_mask = 7
+motion_mode = 1
+script = ExtResource("1_0lqhn")
+behavior = 3
+
+[node name="StateMachine" type="Node" parent="." unique_id=520582749]
+script = ExtResource("2_41bpm")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1592087076]
+libraries/ = SubResource("AnimationLibrary_0lqhn")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1088635542]
+z_index = 1
+position = Vector2(0, -4)
+texture = ExtResource("3_hjpoh")
+hframes = 19
+frame = 7
+
+[node name="HitBox" type="CollisionShape2D" parent="." unique_id=906811026]
+shape = SubResource("CapsuleShape2D_cqiqx")
+debug_color = Color(0.5732935, 0.5551327, 7.70092e-07, 0.41960785)
+
+[node name="Wander" type="Area2D" parent="." unique_id=1347608165]
+monitoring = false
+monitorable = false
+
+[node name="WanderZone" type="CollisionShape2D" parent="Wander" unique_id=1752175431]
+shape = SubResource("CircleShape2D_hjpoh")
+debug_color = Color(1, 1, 1, 0.05490196)
+
+[node name="IdleTimer" type="Timer" parent="." unique_id=2035604576]
+one_shot = true
+
+[node name="TickRate" type="Timer" parent="." unique_id=2101497838]
+wait_time = 0.5
+
+[node name="VigilanceInd" type="Label" parent="." unique_id=605134390]
+z_index = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -20.0
+offset_top = -34.5
+offset_right = 20.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "100"
+label_settings = SubResource("LabelSettings_0lqhn")
+horizontal_alignment = 1
+
+[node name="LifeForceInd" type="Label" parent="." unique_id=82729423]
+z_index = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -20.0
+offset_top = -23.0
+offset_right = 20.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "100"
+label_settings = SubResource("LabelSettings_0lqhn")
+horizontal_alignment = 1
+
+[node name="Detection" type="Area2D" parent="." unique_id=1398069970 groups=["npc"]]
+collision_layer = 4
+collision_mask = 5
+monitorable = false
+
+[node name="Zone" type="CollisionShape2D" parent="Detection" unique_id=1555590754]
+shape = SubResource("CircleShape2D_paujj")
+debug_color = Color(0.61953557, 0.52587545, 0.26343086, 0.41960785)
+
+[node name="Comfort" type="Area2D" parent="." unique_id=1285488212]
+collision_layer = 0
+collision_mask = 5
+monitorable = false
+
+[node name="Zone" type="CollisionShape2D" parent="Comfort" unique_id=7612251]
+shape = SubResource("CircleShape2D_41bpm")
+
+[node name="Sensitive" type="Area2D" parent="." unique_id=187477538]
+collision_layer = 0
+monitorable = false
+
+[node name="Zone" type="CollisionShape2D" parent="Sensitive" unique_id=196461142]
+shape = SubResource("CircleShape2D_0lqhn")
+debug_color = Color(0.8221941, 0.37392876, 0.39523908, 0.41960785)
+
+[node name="Path" type="Line2D" parent="." unique_id=1069542974]
+width = 2.0
+
+[connection signal="timeout" from="TickRate" to="." method="reduce_vigilance"]
+[connection signal="body_entered" from="Sensitive" to="." method="_on_sensitive"]
