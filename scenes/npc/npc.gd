@@ -18,6 +18,7 @@ class_name NPC
 @onready var c_zone: CollisionShape2D = $Comfort/Zone
 @onready var sensitive: Area2D = $Sensitive
 @onready var path: Line2D = $Path
+@onready var check: RayCast2D = $Check
 
 @export_category("Dynamic Parameters")
 @export var move_speed : float = 100.0
@@ -62,6 +63,7 @@ func _ready() -> void:
 	state_machine.change("idle")
 	state_machine._process_pending()
 
+var spd_mult : float = 1.0
 var offender : Node2D
 var target : Node2D
 
@@ -83,6 +85,11 @@ func toggle_zones(enabled: bool, ... zones: Array) -> void:
 		if z is not Area2D: continue
 		_toggle_zone(z, enabled)
 
+func _is_path_clear(destination: Vector2) -> bool:
+	check.target_position = destination
+	check.force_raycast_update()
+	return not check.is_colliding()
+
 func pick_destination(radius: float = 100.0, target_pos: Vector2 = Vector2.ZERO, flee: bool = true) -> Vector2:
 	var angle : float
 	if target_pos:
@@ -91,7 +98,8 @@ func pick_destination(radius: float = 100.0, target_pos: Vector2 = Vector2.ZERO,
 	else:
 		angle = randf() * TAU
 	var distance = radius * sqrt(randf())
-	return Vector2.from_angle(angle) * distance
+	var pot = Vector2.from_angle(angle) * distance
+	return pot if _is_path_clear(pot) else pick_destination(radius, target_pos, flee)
 
 func modify_vigilance(amount: float) -> void:
 	vigilance = max(0, vigilance + amount)
@@ -115,7 +123,7 @@ func move_towards(target_pos: Variant) -> void:
 	path.add_point(Vector2.ZERO)
 	path.add_point(to_local(t))
 	
-	velocity = dir * move_speed
+	velocity = velocity.lerp(dir * move_speed * spd_mult, 0.1)
 	sprite.flip_h = dir.x < 0
 
 func receive_charm(amount: float) -> void:
@@ -132,10 +140,9 @@ func initiate_chase(body: Node2D) -> void:
 	match top:
 		"chase":
 			state_machine.current().start()
-		"struggle":
+		"struggle", "flee", "husk":
 			return
 		_:
-			state_machine.clear()
 			state_machine.change("chase")
 
 func flee_from(body: Node2D) -> void:
@@ -145,7 +152,6 @@ func flee_from(body: Node2D) -> void:
 		if not top: return
 		
 		# check if already fleeing
-		
 		match top.state_name:
 			"flee":
 				top.begin()
@@ -157,6 +163,16 @@ func flee_from(body: Node2D) -> void:
 
 func reduce_vigilance() -> void:
 	modify_vigilance(-(2 * reduc_rate))
+
+func _finish_idling() -> void:
+	match behavior:
+		var n when n <= Behavior.DULLED:
+			if target == null : return
+			if detection.overlaps_body(target) and not comfort.overlaps_body(target):
+				state_machine.change("chase")
+				return
+		
+	state_machine.change("wander")
 
 func _on_detection_body_entered(body: Node2D) -> void:
 	if body is Succubus:

@@ -3,22 +3,43 @@
 [ext_resource type="PackedScene" uid="uid://0vtdhdrxcgxi" path="res://scenes/npc/npc.tscn" id="1_cmejp"]
 [ext_resource type="PackedScene" uid="uid://cyxatyrapq250" path="res://scenes/player/player.tscn" id="2_jvcog"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_hqng7"]
-size = Vector2(1058, 1028)
+[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_0wfyh"]
+normal = Vector2(0, 1)
 
 [node name="Main" type="Node2D" unique_id=80636501]
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=1659175770]
+scale = Vector2(1.5, 1.5)
+limit_enabled = false
 limit_smoothed = true
 position_smoothing_enabled = true
-
-[node name="PlayArea" type="Area2D" parent="." unique_id=542115116]
-
-[node name="Zone" type="CollisionShape2D" parent="PlayArea" unique_id=304651226]
-shape = SubResource("RectangleShape2D_hqng7")
+position_smoothing_speed = 2.0
 
 [node name="NPC" parent="." unique_id=1043865114 instance=ExtResource("1_cmejp")]
 position = Vector2(-5, 4)
 
 [node name="Player" parent="." unique_id=1028600786 instance=ExtResource("2_jvcog")]
 position = Vector2(-402, -228)
+
+[node name="PlayAreaWalls" type="StaticBody2D" parent="." unique_id=1684509974]
+collision_layer = 2
+collision_mask = 0
+
+[node name="Left" type="CollisionShape2D" parent="PlayAreaWalls" unique_id=2130211370]
+position = Vector2(-500, 0)
+rotation = -1.5707964
+shape = SubResource("WorldBoundaryShape2D_0wfyh")
+
+[node name="Right" type="CollisionShape2D" parent="PlayAreaWalls" unique_id=1949714323]
+position = Vector2(500, 0)
+rotation = 1.5707964
+shape = SubResource("WorldBoundaryShape2D_0wfyh")
+
+[node name="Up" type="CollisionShape2D" parent="PlayAreaWalls" unique_id=1234605076]
+position = Vector2(0, -500)
+shape = SubResource("WorldBoundaryShape2D_0wfyh")
+
+[node name="Down" type="CollisionShape2D" parent="PlayAreaWalls" unique_id=2136704120]
+position = Vector2(0, 500)
+rotation = 3.1415927
+shape = SubResource("WorldBoundaryShape2D_0wfyh")

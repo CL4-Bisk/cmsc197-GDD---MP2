@@ -2,8 +2,9 @@ extends CharacterBody2D
 class_name Succubus
 
 @onready var state_machine: GameStateMachine = $StateMachine
-@onready var charm_zone: CollisionShape2D = $CharmZone/Zone
-@onready var feed_zone: Area2D = $FeedZone
+@onready var charm_zone: CollisionShape2D = $Charm/Zone
+@onready var feed_zone: Area2D = $Feed
+@onready var check: RayCast2D = $Check
 
 @onready var anim: AnimationPlayer = $AnimationPlayer
 @onready var sprite: Sprite2D = $Sprite2D
@@ -39,7 +40,6 @@ func _physics_process(_delta: float) -> void:
 			move_to_mouse()
 	(charm_zone.shape as CircleShape2D).radius = life_force
 	move_and_slide()
-	animate_me()
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("feed") and \
@@ -49,13 +49,35 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func move_to_mouse() -> void:
 	if state_machine.current() is SucccubiStates.Feeding: return
+	
 	var mouse_pos = get_global_mouse_position()
 	var dir = global_position.direction_to(mouse_pos)
 	sprite.flip_h = dir.x < 0
-	if not is_mouse_inside: 
-		velocity = dir * move_speed * spd_mult
-	else:
-		velocity = Vector2.ZERO
+	
+	if is_mouse_inside: 
+		velocity = velocity.lerp(Vector2.ZERO, 0.1)
+		anim.play("idle")
+		return
+	
+	var look_distance = 60.0
+	var stop = 20.0
+	
+	check.target_position = dir * look_distance
+	check.force_raycast_update()
+	
+	var spd_mod = 1.0
+
+	if check.is_colliding():
+		var dis_to_wall = global_position.distance_to(check.get_collision_point())
+		if dis_to_wall <= stop:
+			velocity = velocity.lerp(Vector2.ZERO, 0.4)
+			anim.play("idle")
+			return
+		
+		spd_mod = clamp((dis_to_wall - stop)/ look_distance, 0, 1.0)
+	
+	velocity = velocity.lerp(dir * move_speed * spd_mult * spd_mod, 0.1)
+	anim.play("run")
 
 func find_nearest() -> Node2D:
 	var bodies := feed_zone.get_overlapping_bodies()
@@ -73,17 +95,7 @@ func find_nearest() -> Node2D:
 	return nearest
 
 func mouse_detect(toggle: bool) -> void:
-	is_mouse_inside = toggle
-
-func animate_me() -> void:
-	match state_machine.current().state_name:
-		"feed":
-			anim.play("feed")
-		_:
-			if velocity.length() > 0:
-				anim.play("run")
-			else:
-				anim.play("idle")
+	is_mouse_inside = toggle 
 
 func _on_charm(body: Node2D, entered: bool) -> void:
 	if body is NPC:

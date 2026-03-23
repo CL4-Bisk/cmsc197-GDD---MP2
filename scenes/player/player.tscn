@@ -112,34 +112,42 @@ hframes = 19
 frame = 7
 
 [node name="HitBox" type="CollisionShape2D" parent="." unique_id=906811026]
+z_index = 2
 shape = SubResource("CapsuleShape2D_cqiqx")
 debug_color = Color(0.5732935, 0.5551327, 7.70092e-07, 0.41960785)
 
-[node name="CharmZone" type="Area2D" parent="." unique_id=206353401]
+[node name="Charm" type="Area2D" parent="." unique_id=206353401]
 show_behind_parent = true
 z_index = 1
 collision_mask = 4
 
-[node name="Zone" type="CollisionShape2D" parent="CharmZone" unique_id=1810405804]
+[node name="Zone" type="CollisionShape2D" parent="Charm" unique_id=1810405804]
 shape = SubResource("CircleShape2D_vmepk")
 disabled = true
-debug_color = Color(0.6513012, 0.45212996, 0.679536, 0.41960785)
+debug_color = Color(1, 0.5378147, 0.8082103, 0.34117648)
 
-[node name="ChaseZone" type="Area2D" parent="." unique_id=1739261097]
-collision_mask = 0
+[node name="Chase" type="Area2D" parent="." unique_id=1739261097]
+collision_mask = 2
+monitorable = false
 
-[node name="Zone" type="CollisionShape2D" parent="ChaseZone" unique_id=1555590754]
+[node name="Zone" type="CollisionShape2D" parent="Chase" unique_id=1555590754]
+z_index = -1
 shape = SubResource("CircleShape2D_paujj")
 debug_color = Color(1, 1, 1, 0.05490196)
 
-[node name="FeedZone" type="Area2D" parent="." unique_id=1043059715 groups=["succubus"]]
+[node name="Feed" type="Area2D" parent="." unique_id=1043059715 groups=["succubus"]]
 collision_mask = 12
 monitorable = false
 
-[node name="Zone" type="CollisionShape2D" parent="FeedZone" unique_id=1259946591]
+[node name="Zone" type="CollisionShape2D" parent="Feed" unique_id=1259946591]
+z_index = 1
 shape = SubResource("CircleShape2D_q4x0c")
+debug_color = Color(0.7770559, 0.42953065, 0.26532078, 0.28235295)
 
-[connection signal="body_entered" from="CharmZone" to="." method="_on_charm" binds= [true]]
-[connection signal="body_exited" from="CharmZone" to="." method="_on_charm" binds= [false]]
-[connection signal="mouse_exited" from="ChaseZone" to="." method="mouse_detect" binds= [false]]
-[connection signal="mouse_entered" from="FeedZone" to="." method="mouse_detect" binds= [true]]
+[node name="Check" type="RayCast2D" parent="." unique_id=943925329]
+collision_mask = 2
+
+[connection signal="body_entered" from="Charm" to="." method="_on_charm" binds= [true]]
+[connection signal="body_exited" from="Charm" to="." method="_on_charm" binds= [false]]
+[connection signal="mouse_exited" from="Chase" to="." method="mouse_detect" binds= [false]]
+[connection signal="mouse_entered" from="Feed" to="." method="mouse_detect" binds= [true]]
