@@ -33,12 +33,13 @@ func _ready() -> void:
 	state_machine._process_pending()
 
 func _physics_process(_delta: float) -> void:
-	check.target_position = to_local(get_global_mouse_position())
+	var is_pressing_mouse = Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT)
+	
 	match state_machine.current().state_name:
 		"feed", "dead":
 			velocity = Vector2.ZERO
 		_:
-			move_to_mouse()
+			move_to_mouse(is_pressing_mouse)
 	(charm_zone.shape as CircleShape2D).radius = life_force
 	move_and_slide()
 
@@ -48,14 +49,14 @@ func _unhandled_input(event: InputEvent) -> void:
 	feed_zone.has_overlapping_bodies():
 		state_machine.change("feed")
 
-func move_to_mouse() -> void:
+func move_to_mouse(is_pressed : bool) -> void:
 	if state_machine.current() is SucccubiStates.Feeding: return
 	
 	var mouse_pos = get_global_mouse_position()
 	var dir = global_position.direction_to(mouse_pos)
 	sprite.flip_h = dir.x < 0
 	
-	if is_mouse_inside: 
+	if is_mouse_inside or not is_pressed: 
 		velocity = velocity.lerp(Vector2.ZERO, 0.1)
 		anim.play("idle")
 		return
