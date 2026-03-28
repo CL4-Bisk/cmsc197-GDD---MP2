@@ -85,19 +85,26 @@ func _is_path_clear(destination: Vector2) -> bool:
 	return not check.is_colliding()
 
 func pick_destination(
+	attempts: int,
 	max_distance: float,
 	min_distance: float = 0.0,
 	target_pos: Vector2 = Vector2.ZERO,
 	flee: bool = true) -> Vector2:
 	
 	var angle : float = randf() * TAU
-	if target_pos:
+	
+	if target_pos and attempts > 0:
 		var dir = (target_pos - global_position).angle()
 		if flee: dir += PI
 		angle = dir + randf_range(-PI/4, PI/4)
 	var distance = ((max_distance - min_distance) * sqrt(randf())) + min_distance
 	var offset = Vector2.from_angle(angle) * distance
-	return offset if _is_path_clear(offset) else pick_destination(max_distance, min_distance, target_pos, flee)
+	var final_pos = global_position + offset
+	
+	if _is_path_clear(offset):
+		return final_pos
+	else:
+		return pick_destination(attempts-1, max_distance, min_distance, target_pos, flee)
 
 func modify_vigilance(amount: float) -> void:
 	vigilance = max(0, vigilance + amount)

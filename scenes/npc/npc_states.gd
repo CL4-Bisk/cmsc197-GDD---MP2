@@ -30,7 +30,7 @@ class Wander extends GameState:
 		handler.sensitive.set_collision_mask_value(3, false)
 		
 		var o = handler.wander_zone.shape.radius * handler.scale.x
-		destination = handler.global_position + handler.pick_destination(o)
+		destination = handler.pick_destination(10, o)
 		return ""
 	
 	func update(_delta: float) -> String:
@@ -50,21 +50,17 @@ class Flee extends GameState:
 		var t = handler.offender.global_position
 		
 		for a in range(50):
-			var offset = handler.pick_destination(o, i, t)
-			var potential_destination = handler.global_position + offset
+			var potential_destination = handler.pick_destination(10, o, i, t)
 			
 			var is_safe = not Geometry2D.is_point_in_circle(t, potential_destination, i)
 			
 			if is_safe: return potential_destination
 		return handler.global_position + (handler.global_position - t)
 	
-	func start() -> String:
+	func begin() -> String:
 		handler.state_machine.refresh()
 		handler.toggle_zones(false, handler.comfort)
 		handler.spd_mult = 1.5
-		return ""
-	
-	func begin() -> String:
 		handler.sensitive.set_collision_mask_value(3, false)
 		if handler.offender is Player: handler.modify_vigilance(2.5)
 		destination = _find_safe_point()
@@ -91,8 +87,7 @@ class Chase extends GameState:
 		var t = handler.target.global_position
 		
 		for a in range(50):
-			var offset = handler.pick_destination(o, 0, t, false)
-			var potential_destination = handler.global_position + offset
+			var potential_destination = handler.pick_destination(10, o, 0, t, false)
 			var in_range = Geometry2D.is_point_in_circle(t, potential_destination, o)
 			if in_range: return potential_destination
 		return handler.global_position + (handler.target.global_position - handler.global_position)
@@ -118,8 +113,7 @@ class Struggle extends GameState:
 	
 	func _distance() -> Vector2:
 		var radius = handler.c_zone.shape.radius * handler.scale.x
-		var offset = handler.pick_destination(radius)
-		return handler.global_position + offset
+		return handler.pick_destination(10, radius)
 	
 	func start() -> String:
 		handler.toggle_zones(false, handler.sensitive)
