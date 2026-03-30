@@ -6,6 +6,7 @@ class_name NPC
 @onready var sprite: Sprite2D = $Sprite2D
 @onready var hit_box: CollisionShape2D = $HitBox
 @onready var wander_zone: CollisionShape2D = $Wander/WanderZone
+@onready var nav2d: NavigationAgent2D = $Nav2D
 
 @onready var idle_timer: Timer = $IdleTimer
 @onready var tick_rate: Timer = $TickRate
@@ -67,6 +68,24 @@ var offender : Node2D
 var target : Node2D
 
 func _physics_process(_delta: float) -> void:
+	#print(Behavior.find_key(behavior), reduc_rate)
+	#print(state_machine.stack.map(func(x): return x.state_name))
+	
+	var target_vel = Vector2.ZERO
+	if not nav2d.is_navigation_finished():
+		var next_path_pos = nav2d.get_next_path_position()
+		var dis := global_position.distance_to(nav2d.target_position)
+		var dir := global_position.direction_to(next_path_pos)
+		
+		var arrival_mult = clamp(dis / 100.0, 0, 1.0)
+		
+		target_vel = dir * move_speed * spd_mult * arrival_mult
+		sprite.flip_h = dir.x < 0
+		
+	check.target_position = to_local(nav2d.target_position)
+	check.force_raycast_update()
+	
+	velocity = velocity.lerp(target_vel, 0.1)
 	move_and_slide()
 	print(state_machine.stack.map(func(x): return x.state_name))
 	
@@ -103,6 +122,10 @@ func pick_destination(
 	
 	if _is_path_clear(offset):
 		return final_pos
+	var map = get_world_2d().navigation_map
+	var closest = NavigationServer2D.map_get_closest_point(map, final_pos)
+	if _is_path_clear(closest - global_position):
+		return closest
 	else:
 		return pick_destination(attempts-1, max_distance, min_distance, target_pos, flee)
 
@@ -119,17 +142,6 @@ func modify_vigilance(amount: float) -> void:
 func update_indicators() -> void:
 	vigilance_ind.text = str(ceili(vigilance))
 	life_force_ind.text = str(ceili(life_force))
-
-func move_towards(target_pos: Vector2) -> void:
-	var dis := global_position.distance_to(target_pos)
-	var dir := global_position.direction_to(target_pos)
-	
-	var arrival_mult = clamp(dis / 100.0, 0, 1.0)
-	
-	check.target_position = to_local(target_pos)
-	var tar_vel = dir * move_speed * spd_mult * arrival_mult
-	velocity = velocity.lerp(tar_vel, 0.1)
-	sprite.flip_h = dir.x < 0
 
 func receive_charm(amount: float) -> void:
 	reduc_rate = amount * mult[behavior].x * 2
