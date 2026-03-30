@@ -46,9 +46,12 @@ feed={
 2d_render/layer_3="Enemy Succubus"
 2d_render/layer_4="Gang"
 2d_physics/layer_1="player"
+2d_navigation/layer_1="BaseMap"
 2d_physics/layer_2="environment"
+2d_navigation/layer_2="AccessMap"
 2d_physics/layer_3="npc"
 2d_physics/layer_4="items"
+2d_physics/layer_5="access"
 
 [physics]
 
