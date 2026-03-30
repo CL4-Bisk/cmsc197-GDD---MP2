@@ -100,11 +100,11 @@ _data = {
 radius = 7.0
 height = 22.0
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_hjpoh"]
-radius = 200.0
-
 [sub_resource type="LabelSettings" id="LabelSettings_0lqhn"]
 font_size = 8
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_hjpoh"]
+radius = 200.0
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_paujj"]
 radius = 158.71709
@@ -142,16 +142,10 @@ z_index = 1
 shape = SubResource("CapsuleShape2D_cqiqx")
 debug_color = Color(0.5732935, 0.5551327, 7.70092e-07, 0.41960785)
 
-[node name="Wander" type="Area2D" parent="." unique_id=1347608165]
-monitoring = false
-monitorable = false
-
-[node name="WanderZone" type="CollisionShape2D" parent="Wander" unique_id=1752175431]
-shape = SubResource("CircleShape2D_hjpoh")
-debug_color = Color(1, 1, 1, 0.05490196)
-
-[node name="IdleTimer" type="Timer" parent="." unique_id=2035604576]
-one_shot = true
+[node name="Nav2D" type="NavigationAgent2D" parent="." unique_id=911163891]
+target_desired_distance = 50.0
+avoidance_enabled = true
+debug_enabled = true
 
 [node name="TickRate" type="Timer" parent="." unique_id=2101497838]
 wait_time = 0.5
@@ -188,6 +182,14 @@ text = "100"
 label_settings = SubResource("LabelSettings_0lqhn")
 horizontal_alignment = 1
 
+[node name="Wander" type="Area2D" parent="." unique_id=1347608165]
+monitoring = false
+monitorable = false
+
+[node name="WanderZone" type="CollisionShape2D" parent="Wander" unique_id=1752175431]
+shape = SubResource("CircleShape2D_hjpoh")
+debug_color = Color(1, 1, 1, 0.05490196)
+
 [node name="Detection" type="Area2D" parent="." unique_id=1398069970 groups=["npc"]]
 collision_layer = 4
 collision_mask = 5
@@ -214,15 +216,11 @@ monitorable = false
 shape = SubResource("CircleShape2D_0lqhn")
 debug_color = Color(0.8235294, 0.37254903, 0.39607844, 0.5176471)
 
-[node name="Path" type="Line2D" parent="." unique_id=1069542974]
-width = 2.0
-
 [node name="Check" type="RayCast2D" parent="." unique_id=1839204777]
 target_position = Vector2(0, 0)
 collision_mask = 2
 
-[connection signal="timeout" from="IdleTimer" to="." method="_finish_idling"]
 [connection signal="timeout" from="TickRate" to="." method="reduce_vigilance"]
 [connection signal="body_entered" from="Detection" to="." method="_on_detection_body_entered"]
 [connection signal="body_exited" from="Comfort" to="." method="_on_comfort_body_exited"]
-[connection signal="body_entered" from="Sensitive" to="." method="flee_from"]
+[connection signal="body_entered" from="Sensitive" to="." method="_on_sensitive_body_entered"]

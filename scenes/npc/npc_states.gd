@@ -3,28 +3,62 @@ class_name NPCStates
 
 class Idle extends GameState:
 	var handler : NPC
-	func _init() -> void: state_name = "idle"
+	var timer : SceneTreeTimer
+	func _init() -> void: state_name = &"idle"
+	
+	func threat_detected(body: Node2D) -> void:
+		handler.offender = body
+		handler.state_machine.change(&"flee")
+	
+	func interest_detected(body: Node2D) -> void:
+		handler.target = body
+		handler.state_machine.change(&"chase")
 	
 	func begin() -> String:
 		handler.state_machine.refresh()
 		
 		handler.sensitive.set_collision_mask_value(3, true)
-		handler.anim.play("idle")
-		handler.idle_timer.start(handler.wait_time + randf_range(-2, 2))
+		handler.anim.play(&"idle")
+		
 		handler.nav2d.target_position = handler.global_position
+		
+		timer = handler.get_tree().create_timer(
+			handler.wait_time + randf_range(-2, 2)
+		)
+		timer.timeout.connect(_idle_finished)
 		return ""
+	
+	func _idle_finished() -> void:
+		match handler.behavior:
+			var n when n <= NPC.Behavior.DULLED:
+				if handler.target != null:
+					if handler.detection.overlaps_body(handler.target) and \
+					not handler.comfort.overlaps_body(handler.target):
+						handler.state_machine.change(&"chase")
+						return
+		handler.state_machine.change(&"wander")
 	
 	func update(_delta: float) -> String:
 		handler.velocity = handler.velocity.lerp(Vector2.ZERO, 0.1)
 		return ""
 	
 	func end() -> String:
-		handler.idle_timer.stop()
+		timer.timeout.disconnect(_idle_finished)
 		return ""
 
 class Wander extends GameState:
 	var handler : NPC
-	func _init() -> void: state_name = "wander"
+	func _init() -> void: state_name = &"wander"
+	
+	func threat_detected(body: Node2D) -> void:
+		handler.state_machine.back()
+		handler.offender = body
+		handler.state_machine.change(&"flee")
+	
+	func interest_detected(body: Node2D) -> void:
+		handler.state_machine.back()
+		handler.target = body
+		handler.state_machine.change(&"chase")
 	
 	func begin() -> String:
 		handler.sensitive.set_collision_mask_value(3, false)
@@ -39,8 +73,11 @@ class Wander extends GameState:
 
 class Flee extends GameState:
 	var handler : NPC
-	func _init() -> void:
-		state_name = "flee"
+	func _init() -> void: state_name = &"flee"
+	
+	func threat_detected(body: Node2D) -> void:
+		handler.offender = body
+		begin()
 	
 	func _find_safe_point() -> Vector2:
 		var o = handler.wander_zone.shape.radius * handler.scale.x
@@ -56,12 +93,10 @@ class Flee extends GameState:
 		return handler.global_position + (handler.global_position - t)
 	
 	func begin() -> String:
-		handler.state_machine.refresh()
 		handler.toggle_zones(false, handler.comfort)
 		handler.spd_mult = 1.5
 		handler.sensitive.set_collision_mask_value(3, false)
 		if handler.offender is Player: handler.modify_vigilance(2.5)
-		destination = _find_safe_point()
 		handler.nav2d.target_position = _find_safe_point()
 		return ""
 	
@@ -72,13 +107,20 @@ class Flee extends GameState:
 	func finish() -> void:
 		handler.spd_mult = 1.0
 		handler.toggle_zones(true, handler.comfort)
-		if handler.sensitive.overlaps_body(handler.offender): handler.flee_from(handler.offender)
-		if handler.state_machine.stack.is_empty(): handler.state_machine.change("idle")
 
 class Chase extends GameState:
 	var handler : NPC
-	func _init() -> void: state_name = "chase"
+	func _init() -> void: state_name = &"chase"
 	
+	func threat_detected(body: Node2D) -> void:
+		handler.state_machine.back()
+		handler.offender = body
+		handler.state_machine.change(&"flee")
+	
+	func interest_detected(body: Node2D) -> void:
+		handler.target = body
+		start()
+
 	func _find_approachable_distance() -> Vector2:
 		var o = handler.c_zone.shape.radius * handler.scale.x
 		var t = handler.target.global_position
@@ -90,7 +132,6 @@ class Chase extends GameState:
 		return handler.global_position + (handler.target.global_position - handler.global_position)
 	
 	func start() -> String:
-		handler.state_machine.refresh()
 		handler.nav2d.target_position = _find_approachable_distance()
 		return ""
 	
@@ -98,13 +139,10 @@ class Chase extends GameState:
 		if handler.nav2d.is_navigation_finished(): return &"pop"
 		if handler.behavior == NPC.Behavior.CHARMED: handler.nav2d.target_position = handler.target.global_position
 		return ""
-	
-	func finish() -> void:
-		if handler.state_machine.stack.is_empty(): handler.state_machine.change("idle")
 
 class Struggle extends GameState:
 	var handler : NPC
-	func _init() -> void: state_name = "struggle"
+	func _init() -> void: state_name = &"struggle"
 	
 	func _distance() -> Vector2:
 		var radius = handler.c_zone.shape.radius * handler.scale.x
@@ -124,7 +162,7 @@ class Struggle extends GameState:
 		handler.update_indicators()
 		if handler.life_force <= 0:
 			handler.state_machine.refresh()
-			return "husk"
+			return &"husk"
 		
 		return ""
 	
@@ -134,7 +172,7 @@ class Struggle extends GameState:
 
 class Husk extends GameState:
 	var handler : NPC
-	func _init() -> void: state_name = "husk"
+	func _init() -> void: state_name = &"husk"
 	
 	func begin() -> String:
 		handler.spd_mult = 0.5
@@ -147,4 +185,3 @@ class Husk extends GameState:
 		handler.modulate.a = 0.5
 		handler.set_collision_layer_value(3, false)
 		return ""
-		

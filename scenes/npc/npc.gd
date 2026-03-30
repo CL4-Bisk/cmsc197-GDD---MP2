@@ -4,15 +4,14 @@ class_name NPC
 @onready var state_machine: GameStateMachine = $StateMachine
 @onready var anim: AnimationPlayer = $AnimationPlayer
 @onready var sprite: Sprite2D = $Sprite2D
-@onready var hit_box: CollisionShape2D = $HitBox
-@onready var wander_zone: CollisionShape2D = $Wander/WanderZone
 @onready var nav2d: NavigationAgent2D = $Nav2D
 
-@onready var idle_timer: Timer = $IdleTimer
 @onready var tick_rate: Timer = $TickRate
 @onready var vigilance_ind: Label = $VigilanceInd
 @onready var life_force_ind: Label = $LifeForceInd
 
+# detectors
+@onready var wander_zone: CollisionShape2D = $Wander/WanderZone
 @onready var detection: Area2D = $Detection
 @onready var d_zone: CollisionShape2D = $Detection/Zone
 @onready var comfort: Area2D = $Comfort
@@ -53,14 +52,14 @@ func _ready() -> void:
 	
 	state_machine.handler = self
 	
-	state_machine.register_state("idle", NPCStates.Idle)
-	state_machine.register_state("wander", NPCStates.Wander)
-	state_machine.register_state("flee", NPCStates.Flee)
-	state_machine.register_state("struggle", NPCStates.Struggle)
-	state_machine.register_state("chase", NPCStates.Chase)
-	state_machine.register_state("husk", NPCStates.Husk)
+	state_machine.register_state(&"idle", NPCStates.Idle)
+	state_machine.register_state(&"wander", NPCStates.Wander)
+	state_machine.register_state(&"flee", NPCStates.Flee)
+	state_machine.register_state(&"struggle", NPCStates.Struggle)
+	state_machine.register_state(&"chase", NPCStates.Chase)
+	state_machine.register_state(&"husk", NPCStates.Husk)
 	
-	state_machine.change("idle")
+	state_machine.change(&"idle")
 	state_machine._process_pending()
 
 var spd_mult : float = 1.0
@@ -87,7 +86,6 @@ func _physics_process(_delta: float) -> void:
 	
 	velocity = velocity.lerp(target_vel, 0.1)
 	move_and_slide()
-	print(state_machine.stack.map(func(x): return x.state_name))
 	
 	if state_machine.current() and state_machine.current().state_name == "struggle": return
 	if velocity.length() <= 1: anim.play("idle")
@@ -120,8 +118,6 @@ func pick_destination(
 	var offset = Vector2.from_angle(angle) * distance
 	var final_pos = global_position + offset
 	
-	if _is_path_clear(offset):
-		return final_pos
 	var map = get_world_2d().navigation_map
 	var closest = NavigationServer2D.map_get_closest_point(map, final_pos)
 	if _is_path_clear(closest - global_position):
@@ -144,58 +140,42 @@ func update_indicators() -> void:
 	life_force_ind.text = str(ceili(life_force))
 
 func receive_charm(amount: float) -> void:
-	reduc_rate = amount * mult[behavior].x * 2
+	reduc_rate = amount * mult[behavior].x
 	if amount > 0:
 		tick_rate.start()
 	else:
 		tick_rate.stop()
 
-func initiate_chase(body: Node2D) -> void:
-	target = body
-	
-	var top = state_machine.current().state_name
-	match top:
-		"chase":
-			state_machine.current().start()
-		"struggle", "flee", "husk":
-			return
-		_:
-			state_machine.change("chase")
-
-func flee_from(body: Node2D) -> void:
-	if body == self: return
-	offender = body
-	var top = state_machine.current()
-	if not top: return
-	
-	# check if already fleeing
-	match top.state_name:
-		"flee": top.begin()
-		"husk", "struggle": return
-		_:
-			state_machine.clear()
-			state_machine.change("flee")
-
 func reduce_vigilance() -> void:
+	reduc_rate = mult[behavior].x
 	modify_vigilance(-(2 * reduc_rate))
 
-func _finish_idling() -> void:
-	match behavior:
-		var n when n <= Behavior.DULLED:
-			if target == null : return
-			if detection.overlaps_body(target) and not comfort.overlaps_body(target):
-				state_machine.change("chase")
-				return
-		
-	state_machine.change("wander")
-
 func _on_detection_body_entered(body: Node2D) -> void:
+	if body == self: return
+	
+	var current_state = state_machine.current()
+	
 	if body is Player:
 		match behavior:
-			Behavior.TERRIFIED: flee_from(body)
-			var n when n <= Behavior.DULLED: initiate_chase(body)
+			Behavior.TERRIFIED: 
+				if current_state.has_method(&"threat_detected"):
+					current_state.threat_detected(body)
+			var n when n <= Behavior.DULLED: 
+				if current_state.has_method(&"interest_detected"):
+					current_state.interest_detected(body)
 
 func _on_comfort_body_exited(body: Node2D) -> void:
+	if body == self: return
+	var current_state = state_machine.current()
+	
 	if body is Player:
 		match behavior:
-			var n when n <= Behavior.DULLED: initiate_chase(body)
+			var n when n <= Behavior.DULLED: 
+				if current_state.has_method(&"interest_detected"):
+					current_state.interest_detected(body)
+
+func _on_sensitive_body_entered(body: Node2D) -> void:
+	if body == self: return
+	var current_state = state_machine.current()
+	if current_state.has_method(&"threat_detected"):
+		current_state.threat_detected(body)
