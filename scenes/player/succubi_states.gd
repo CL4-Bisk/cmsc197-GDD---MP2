@@ -5,15 +5,15 @@ class Normal extends GameState:
 	var handler : Player
 	
 	func _init() -> void:
-		state_name = "normal"
+		state_name = &"normal"
 	
 	func begin() -> String:
 		handler.spd_mult = 1.0
 		return ""
 	
 	func update(_delta: float) -> String:
-		if Input.is_action_just_pressed("charm"):
-			return "charm"
+		if Input.is_action_just_pressed(&"charm"):
+			return &"charm"
 		return ""
 
 class Charming extends GameState:
@@ -21,7 +21,7 @@ class Charming extends GameState:
 	var t : Tween
 	
 	func _init() -> void:
-		state_name = "charm"
+		state_name = &"charm"
 	
 	func begin() -> String:
 		handler.spd_mult = 0.5
@@ -35,8 +35,8 @@ class Charming extends GameState:
 		return ""
 	
 	func update(_delta: float) -> String:
-		if Input.is_action_just_released("charm"):
-			return "pop"
+		if Input.is_action_just_released(&"charm"):
+			return &"pop"
 		return ""
 	
 	func finish() -> void:
@@ -50,13 +50,13 @@ class Feeding extends GameState:
 	var t: Tween
 	
 	func _init() -> void:
-		state_name = "feed"
+		state_name = &"feed"
 	
 	func start() -> String:
-		handler.anim.play("feed")
+		handler.anim.play(&"feed")
 		handler.state_machine.refresh()
 		handler.spd_mult = 0
-		handler.hit_box.set_deferred("disabled", true)
+		handler.hit_box.set_deferred(&"disabled", true)
 		
 		var x = handler.find_nearest()
 		if x:
@@ -68,34 +68,35 @@ class Feeding extends GameState:
 			t.tween_property(handler, "global_position", feeding_target.global_position, 0.1)
 		
 			feeding_target.reduc_rate = handler.charm_power
-			feeding_target.state_machine.change("struggle")
+			feeding_target.state_machine.change(&"flee")
+			feeding_target.state_machine.change(&"struggle")
 		return ""
 	
 	func begin() -> String:
 		if feeding_target: return ""
-		return "repeat"
+		return &"repeat"
 		
 	func update(delta: float) -> String:
 		handler.total_life_force += feeding_target.reduc_rate * delta
 		handler.life_force += feeding_target.reduc_rate * delta
 		
-		if Input.is_action_just_pressed("feed"): 
+		if Input.is_action_just_pressed(&"feed"): 
 			feeding_target.state_machine.back()
-			return "pop"
-		if feeding_target.life_force <= 0: return "pop"
+			return &"pop"
+		if feeding_target.life_force <= 0: return &"pop"
 		if t and t.is_running(): return ""
 		handler.global_position = feeding_target.global_position
 		return ""
 	
 	func finish() -> void:
-		handler.state_machine.change("normal")
+		handler.state_machine.change(&"normal")
 		handler.hit_box.set_deferred("disabled", false)
 
 class Lustful extends GameState:
 	var handler : Player
 	
 	func _init() -> void:
-		state_name = "lust"
+		state_name = &"lust"
 	
 	func start() -> String:
 			handler.spd_mult = 2.0
@@ -105,7 +106,7 @@ class Subjugated extends GameState:
 	var handler : Player
 	
 	func _init() -> void:
-		state_name = "dead"
+		state_name = &"dead"
 	
 	func start() -> String:
 		handler.spd_mult = 1.0

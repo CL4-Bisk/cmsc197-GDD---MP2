@@ -15,10 +15,10 @@ func change(state_name: String) -> void:
 	pending.append(state_name)
 
 func back() -> void:
-	pending.append("pop")
+	pending.append(&"pop")
 
 func clear() -> void:
-	pending.append("clear")
+	pending.append(&"clear")
 
 func refresh() -> void:
 	stack = [stack[-1]]
@@ -35,21 +35,21 @@ func _process(delta: float) -> void:
 	# START
 	if not state.started:
 		state.started = true
-		if state.start() == "repeat":
+		if state.start() == &"repeat":
 			repeat = true
 	
 	# BEGIN
 	if not repeat and not state.processed:
 		state.processed = true
-		if state.begin() == "repeat":
+		if state.begin() == &"repeat":
 			repeat = true
 	
 	# UPDATED
 	if not repeat:
 		var transition = state.update(delta)
-		if transition != "" and transition != "repeat":
+		if transition != "" and transition != &"repeat":
 			change(transition)
-		elif transition == "repeat":
+		elif transition == &"repeat":
 			repeat = true
 	
 	# END
@@ -66,15 +66,15 @@ func _pop(s: GameState):
 func _process_pending() -> void:
 	for transition: Variant in pending:
 		match transition:
-			"pop":
+			&"pop":
 				if stack.size() > 0:
 					_pop(stack.pop_back())
-			"clear":
+			&"clear":
 				while stack.size() > 0:
 					_pop(stack.pop_back())
 			_:
 				var new_state: GameState = state_registry[transition].new()
-				if "handler" in new_state:
+				if &"handler" in new_state:
 					new_state.handler = self.handler
 				new_state.state_name = transition
 				stack.append(new_state)

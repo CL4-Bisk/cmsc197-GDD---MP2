@@ -7,7 +7,6 @@ var started : bool = false
 var processed : bool = false
 
 # first instantiated
-
 func start() -> String:
 	return ""
 

@@ -23,20 +23,20 @@ var spd_mult : float = 1.0
 func _ready() -> void:
 	state_machine.handler = self
 	
-	state_machine.register_state("normal", SucccubiStates.Normal)
-	state_machine.register_state("charm", SucccubiStates.Charming)
-	state_machine.register_state("feed", SucccubiStates.Feeding)
-	state_machine.register_state("lust", SucccubiStates.Lustful)
-	state_machine.register_state("dead", SucccubiStates.Subjugated)
+	state_machine.register_state(&"normal", SucccubiStates.Normal)
+	state_machine.register_state(&"charm", SucccubiStates.Charming)
+	state_machine.register_state(&"feed", SucccubiStates.Feeding)
+	state_machine.register_state(&"lust", SucccubiStates.Lustful)
+	state_machine.register_state(&"dead", SucccubiStates.Subjugated)
 	
-	state_machine.change("normal")
+	state_machine.change(&"normal")
 	state_machine._process_pending()
 
 func _physics_process(_delta: float) -> void:
 	var is_pressing_mouse = Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT)
 	
 	match state_machine.current().state_name:
-		"feed", "dead":
+		&"feed", &"dead":
 			velocity = Vector2.ZERO
 		_:
 			move_to_mouse(is_pressing_mouse)
@@ -44,10 +44,10 @@ func _physics_process(_delta: float) -> void:
 	move_and_slide()
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("feed") and \
-	state_machine.current().state_name != "feed" and \
+	if event.is_action_pressed(&"feed") and \
+	state_machine.current().state_name != &"feed" and \
 	feed_zone.has_overlapping_bodies():
-		state_machine.change("feed")
+		state_machine.change(&"feed")
 
 func move_to_mouse(is_pressed : bool) -> void:
 	if state_machine.current() is SucccubiStates.Feeding: return
@@ -58,7 +58,7 @@ func move_to_mouse(is_pressed : bool) -> void:
 	
 	if is_mouse_inside or not is_pressed: 
 		velocity = velocity.lerp(Vector2.ZERO, 0.1)
-		anim.play("idle")
+		anim.play(&"idle")
 		return
 	
 	var look_distance = 60.0
@@ -73,13 +73,13 @@ func move_to_mouse(is_pressed : bool) -> void:
 		var dis_to_wall = global_position.distance_to(check.get_collision_point())
 		if dis_to_wall <= stop:
 			velocity = velocity.lerp(Vector2.ZERO, 0.4)
-			anim.play("idle")
+			anim.play(&"idle")
 			return
 		
 		spd_mod = clamp((dis_to_wall - stop)/ look_distance, 0, 1.0)
 	
 	velocity = velocity.lerp(dir * move_speed * spd_mult * spd_mod, 0.1)
-	anim.play("run")
+	anim.play(&"run")
 
 func find_nearest() -> Node2D:
 	var bodies := feed_zone.get_overlapping_bodies()
@@ -87,7 +87,7 @@ func find_nearest() -> Node2D:
 	var min_dis = INF
 	
 	for body in bodies:
-		if not body.is_in_group("npc") and body == self: continue
+		if not body.is_in_group(&"npc") and body == self: continue
 		
 		var distance = global_position.distance_to(body.global_position)
 		if distance < min_dis:
