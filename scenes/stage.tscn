@@ -11,75 +11,29 @@ polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2, 3, 4)])
 outlines = Array[PackedVector2Array]([PackedVector2Array(0, 503, 504, 503, 504, 0, 504, -505, 0, -505, -504, -505, -504, -1, -503, 503)])
 
 [sub_resource type="NavigationPolygon" id="NavigationPolygon_vcsse"]
-vertices = PackedVector2Array(-507, 475.07813, -786.9922, 321.09375, -786, -324.0703, -507, -477.10156)
-polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2, 3)])
-outlines = Array[PackedVector2Array]([PackedVector2Array(-796, -330, -497, -494, -497, 492, -797, 327)])
-
-[sub_resource type="NavigationPolygon" id="NavigationPolygon_2so7o"]
-vertices = PackedVector2Array(788, -323.0703, 788, 324.03125, 505.97656, 476.2422, 505.0078, -478.10938)
-polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2, 3)])
-outlines = Array[PackedVector2Array]([PackedVector2Array(798, -329, 495, -495, 496, 493, 798, 330)])
-
-[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_0wfyh"]
-normal = Vector2(0, 1)
+vertices = PackedVector2Array(-490, 495.8203, -806, 337.8203, -806, -337.8203, -490, -495.8203, 806, -337.8203, 806, 337.8203, 490, 495.8203, 490, -495.8203)
+polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2, 3), PackedInt32Array(4, 5, 6, 7)])
+outlines = Array[PackedVector2Array]([PackedVector2Array(-816, -344, -480, -512, -480, 512, -816, 344), PackedVector2Array(480, -512, 816, -344, 816, 344, 480, 512)])
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_6c5u0"]
 size = Vector2(94, 660)
 
-[node name="Stage" type="Node2D" unique_id=80636501]
+[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_0wfyh"]
+normal = Vector2(0, 1)
+
+[node name="Stage" type="Node" unique_id=1737466017]
 script = ExtResource("1_kewym")
+npc_scene = ExtResource("2_6c5u0")
 
 [node name="Map" type="Node" parent="." unique_id=1861578752]
 
 [node name="BaseMap" type="NavigationRegion2D" parent="Map" unique_id=1717322058]
 navigation_polygon = SubResource("NavigationPolygon_6c5u0")
+navigation_layers = 5
 
-[node name="LeftAccess" type="NavigationRegion2D" parent="Map" unique_id=1274228431]
+[node name="AccessMap" type="NavigationRegion2D" parent="Map" unique_id=1556500309]
 navigation_polygon = SubResource("NavigationPolygon_vcsse")
-navigation_layers = 2
-
-[node name="RightAccess" type="NavigationRegion2D" parent="Map" unique_id=1875424293]
-navigation_polygon = SubResource("NavigationPolygon_2so7o")
-navigation_layers = 2
-
-[node name="Camera2D" type="Camera2D" parent="." unique_id=1659175770 node_paths=PackedStringArray("target")]
-scale = Vector2(1.5, 1.5)
-process_callback = 0
-limit_enabled = false
-limit_smoothed = true
-position_smoothing_enabled = true
-script = ExtResource("2_vcsse")
-target = NodePath("../Player")
-
-[node name="Player" parent="." unique_id=1028600786 instance=ExtResource("3_vcsse")]
-position = Vector2(291, 317)
-
-[node name="NPC" parent="." unique_id=1043865114 instance=ExtResource("2_6c5u0")]
-position = Vector2(439, 429)
-behavior = 2
-
-[node name="PlayAreaWalls" type="StaticBody2D" parent="." unique_id=1684509974]
-collision_layer = 2
-collision_mask = 0
-
-[node name="Left" type="CollisionShape2D" parent="PlayAreaWalls" unique_id=2130211370]
-position = Vector2(-504, 0)
-rotation = -1.5707964
-shape = SubResource("WorldBoundaryShape2D_0wfyh")
-
-[node name="Right" type="CollisionShape2D" parent="PlayAreaWalls" unique_id=1949714323]
-position = Vector2(504, 0)
-rotation = 1.5707964
-shape = SubResource("WorldBoundaryShape2D_0wfyh")
-
-[node name="Up" type="CollisionShape2D" parent="PlayAreaWalls" unique_id=1234605076]
-position = Vector2(0, -504)
-shape = SubResource("WorldBoundaryShape2D_0wfyh")
-
-[node name="Down" type="CollisionShape2D" parent="PlayAreaWalls" unique_id=2136704120]
-position = Vector2(0, 504)
-rotation = 3.1415927
-shape = SubResource("WorldBoundaryShape2D_0wfyh")
+navigation_layers = 4
 
 [node name="AccessZones" type="Area2D" parent="." unique_id=867218274]
 collision_layer = 16
@@ -91,3 +45,41 @@ shape = SubResource("RectangleShape2D_6c5u0")
 [node name="Right" type="CollisionShape2D" parent="AccessZones" unique_id=864354735]
 position = Vector2(750, 0)
 shape = SubResource("RectangleShape2D_6c5u0")
+
+[node name="PlayAreaWalls" type="StaticBody2D" parent="." unique_id=1684509974]
+collision_layer = 2
+collision_mask = 0
+
+[node name="Left" type="CollisionShape2D" parent="PlayAreaWalls" unique_id=2130211370]
+position = Vector2(-504, 0)
+rotation = -1.5707964
+shape = SubResource("WorldBoundaryShape2D_0wfyh")
+one_way_collision = true
+
+[node name="Right" type="CollisionShape2D" parent="PlayAreaWalls" unique_id=1949714323]
+position = Vector2(504, 0)
+rotation = 1.5707964
+shape = SubResource("WorldBoundaryShape2D_0wfyh")
+one_way_collision = true
+
+[node name="Up" type="CollisionShape2D" parent="PlayAreaWalls" unique_id=1234605076]
+position = Vector2(0, -504)
+shape = SubResource("WorldBoundaryShape2D_0wfyh")
+one_way_collision = true
+
+[node name="Down" type="CollisionShape2D" parent="PlayAreaWalls" unique_id=2136704120]
+position = Vector2(0, 504)
+rotation = 3.1415927
+shape = SubResource("WorldBoundaryShape2D_0wfyh")
+one_way_collision = true
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=1659175770 node_paths=PackedStringArray("target")]
+zoom = Vector2(0.8, 0.8)
+process_callback = 0
+limit_enabled = false
+limit_smoothed = true
+position_smoothing_enabled = true
+script = ExtResource("2_vcsse")
+target = NodePath("../Player")
+
+[node name="Player" parent="." unique_id=1028600786 instance=ExtResource("3_vcsse")]

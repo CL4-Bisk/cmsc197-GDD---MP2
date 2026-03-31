@@ -36,6 +36,9 @@ class Idle extends GameState:
 					not handler.comfort.overlaps_body(handler.target):
 						handler.state_machine.change(&"chase")
 						return
+		if (randf() < 0.1):
+			handler.state_machine.change(&"exit")
+			return
 		handler.state_machine.change(&"wander")
 	
 	func update(_delta: float) -> String:
@@ -175,7 +178,7 @@ class Husk extends GameState:
 	var handler : NPC
 	func _init() -> void: state_name = &"husk"
 	
-	func begin() -> String:
+	func start() -> String:
 		handler.spd_mult = 0.5
 		handler.state_machine.refresh()
 		handler.toggle_zones(false, handler.sensitive, handler.comfort, handler.detection)
@@ -183,6 +186,66 @@ class Husk extends GameState:
 		handler.nav2d.target_position = handler.global_position
 		
 		handler.velocity = Vector2.ZERO
+		handler.set_spd(100)
 		handler.modulate.a = 0.5
 		handler.set_collision_layer_value(3, false)
+		handler.set_collision_mask_value(2, false)
+		handler.state_machine.change(&"exit")
+		return "repeat"
+
+class Enter extends GameState:
+	var handler : NPC
+	func _init() -> void: state_name = &"enter"
+	
+	func threat_detected(body: Node2D) -> void:
+		handler.state_machine.back()
+		handler.offender = body
+		handler.state_machine.change(&"flee")
+	
+	func interest_detected(body: Node2D) -> void:
+		handler.state_machine.back()
+		handler.target = body
+		handler.state_machine.change(&"chase")
+	
+	func start() -> String:
+		handler.set_spd(handler.move_speed)
+		handler.nav2d.set_navigation_layer_value(3, true)
+		handler.nav2d.set_navigation_layer_value(1, false)
 		return ""
+	
+	func update(_delta: float) -> String:
+		if handler.nav2d.is_navigation_finished(): return &"pop"
+		return ""
+	
+	func end() -> String:
+		handler.nav2d.set_navigation_layer_value(1, true)
+		handler.nav2d.set_navigation_layer_value(3, false)
+		return ""
+
+class Exit extends GameState:
+	var handler : NPC
+	func _init() -> void: state_name = &"exit"
+	
+	func threat_detected(body: Node2D) -> void:
+		handler.state_machine.back()
+		handler.offender = body
+		handler.state_machine.change(&"flee")
+	
+	func interest_detected(body: Node2D) -> void:
+		handler.state_machine.back()
+		handler.target = body
+		handler.state_machine.change(&"chase")
+	
+	func start() -> String:
+		handler.nav2d.target_position = handler.stage.pick_access_point()
+		handler.nav2d.set_navigation_layer_value(3, true)
+		handler.nav2d.set_navigation_layer_value(1, false)
+		return ""
+		
+	func update(_delta: float) -> String:
+		if handler.nav2d.is_navigation_finished(): handler.queue_free()
+		return ""
+	
+	func finish() -> void:
+		handler.nav2d.set_navigation_layer_value(1, true)
+		handler.nav2d.set_navigation_layer_value(3, false)

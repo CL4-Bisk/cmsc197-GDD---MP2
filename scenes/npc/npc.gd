@@ -53,6 +53,9 @@ func _ready() -> void:
 	state_machine.register_state(&"struggle", NPCStates.Struggle)
 	state_machine.register_state(&"chase", NPCStates.Chase)
 	state_machine.register_state(&"husk", NPCStates.Husk)
+	state_machine.register_state(&"enter", NPCStates.Enter)
+	state_machine.register_state(&"exit", NPCStates.Exit)
+
 func start_state(state_name: StringName = &"") -> void:
 	state_machine.change(&"idle")
 	if state_name != &"":
@@ -61,6 +64,7 @@ func start_state(state_name: StringName = &"") -> void:
 
 var spd_mult : float = 1.0
 var _spd : float
+var stage : Stage
 var offender : Node2D
 var target : Node2D
 
