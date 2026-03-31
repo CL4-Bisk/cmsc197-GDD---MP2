@@ -1,5 +1,5 @@
-extends Node2D
-class_name stage
+extends Node
+class_name Stage
 
 @onready var player: Player = $Player
 @onready var access_zones: Area2D = $AccessZones

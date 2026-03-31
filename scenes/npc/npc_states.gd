@@ -63,7 +63,7 @@ class Wander extends GameState:
 	func begin() -> String:
 		handler.sensitive.set_collision_mask_value(3, false)
 		
-		var o = handler.wander_zone.shape.radius * handler.scale.x
+		var o = handler.d_zone.shape.radius * handler.scale.x
 		handler.nav2d.target_position = handler.pick_destination(10, o)
 		return ""
 	
@@ -80,7 +80,7 @@ class Flee extends GameState:
 		begin()
 	
 	func _find_safe_point() -> Vector2:
-		var o = handler.wander_zone.shape.radius * handler.scale.x
+		var o = handler.d_zone.shape.radius * handler.scale.x
 		var i = handler.c_zone.shape.radius * handler.scale.x
 		var t = handler.offender.global_position
 		

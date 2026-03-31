@@ -69,7 +69,6 @@ class Feeding extends GameState:
 			t.tween_property(handler, "global_position", feeding_target.global_position, 0.1)
 		
 			feeding_target.reduc_rate = handler.charm_power
-			feeding_target.state_machine.change(&"flee")
 			feeding_target.state_machine.change(&"struggle")
 		return ""
 	

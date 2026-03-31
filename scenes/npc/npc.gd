@@ -7,11 +7,8 @@ class_name NPC
 @onready var nav2d: NavigationAgent2D = $Nav2D
 
 @onready var tick_rate: Timer = $TickRate
-@onready var vigilance_ind: Label = $VigilanceInd
-@onready var life_force_ind: Label = $LifeForceInd
 
 # detectors
-@onready var wander_zone: CollisionShape2D = $Wander/WanderZone
 @onready var detection: Area2D = $Detection
 @onready var d_zone: CollisionShape2D = $Detection/Zone
 @onready var comfort: Area2D = $Comfort
@@ -48,18 +45,18 @@ enum Behavior {
 }
 
 func _ready() -> void:
-	update_indicators()
 	
 	state_machine.handler = self
-	
 	state_machine.register_state(&"idle", NPCStates.Idle)
 	state_machine.register_state(&"wander", NPCStates.Wander)
 	state_machine.register_state(&"flee", NPCStates.Flee)
 	state_machine.register_state(&"struggle", NPCStates.Struggle)
 	state_machine.register_state(&"chase", NPCStates.Chase)
 	state_machine.register_state(&"husk", NPCStates.Husk)
-	
+func start_state(state_name: StringName = &"") -> void:
 	state_machine.change(&"idle")
+	if state_name != &"":
+		state_machine.change(state_name)
 	state_machine._process_pending()
 
 var spd_mult : float = 1.0
@@ -70,6 +67,7 @@ var target : Node2D
 func _physics_process(_delta: float) -> void:
 	#print(Behavior.find_key(behavior), reduc_rate)
 	#print(state_machine.stack.map(func(x): return x.state_name))
+	update_indicators()
 	
 	navigate()
 	if state_machine.current() and state_machine.current().state_name == "struggle": return
@@ -152,11 +150,12 @@ func modify_vigilance(amount: float) -> void:
 		if vigilance <= comparison:
 			behavior = i
 			break
-	update_indicators()
 
 func update_indicators() -> void:
-	vigilance_ind.text = str(ceili(vigilance))
-	life_force_ind.text = str(ceili(life_force))
+	$VigilanceInd.text = str(ceili(vigilance))
+	$LifeForceInd.text = str(ceili(life_force))
+	if state_machine.current():
+		$StateInd.text = state_machine.current().state_name
 
 func receive_charm(amount: float) -> void:
 	reduc_rate = amount * mult[behavior].x
