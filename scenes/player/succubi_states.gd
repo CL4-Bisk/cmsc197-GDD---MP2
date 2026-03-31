@@ -57,6 +57,7 @@ class Feeding extends GameState:
 		handler.state_machine.refresh()
 		handler.spd_mult = 0
 		handler.hit_box.set_deferred(&"disabled", true)
+		handler.nav2d.avoidance_enabled = false
 		
 		var x = handler.find_nearest()
 		if x:
@@ -90,6 +91,7 @@ class Feeding extends GameState:
 	
 	func finish() -> void:
 		handler.state_machine.change(&"normal")
+		handler.nav2d.avoidance_enabled = true
 		handler.hit_box.set_deferred("disabled", false)
 
 class Lustful extends GameState:

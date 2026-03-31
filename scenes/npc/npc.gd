@@ -63,6 +63,7 @@ func _ready() -> void:
 	state_machine._process_pending()
 
 var spd_mult : float = 1.0
+var _spd : float
 var offender : Node2D
 var target : Node2D
 
@@ -70,26 +71,39 @@ func _physics_process(_delta: float) -> void:
 	#print(Behavior.find_key(behavior), reduc_rate)
 	#print(state_machine.stack.map(func(x): return x.state_name))
 	
+	navigate()
+	if state_machine.current() and state_machine.current().state_name == "struggle": return
+	if velocity.length() <= 1: anim.play("idle")
+	else: anim.play("run")
+
+func navigate() -> void:
 	var target_vel = Vector2.ZERO
 	if not nav2d.is_navigation_finished():
 		var next_path_pos = nav2d.get_next_path_position()
+		
+		check.target_position = to_local(next_path_pos)
+		
 		var dis := global_position.distance_to(nav2d.target_position)
 		var dir := global_position.direction_to(next_path_pos)
 		
 		var arrival_mult = clamp(dis / 100.0, 0, 1.0)
 		
-		target_vel = dir * move_speed * spd_mult * arrival_mult
+		target_vel = dir * _spd * spd_mult * arrival_mult
 		sprite.flip_h = dir.x < 0
 		
-	check.target_position = to_local(nav2d.target_position)
 	check.force_raycast_update()
+	nav2d.set_velocity(target_vel)
+
+func _on_nav_2d_velocity_computed(safe_velocity: Vector2) -> void:
+	if state_machine.current() == null: return
 	
-	velocity = velocity.lerp(target_vel, 0.1)
+	if state_machine.current().state_name != &"idle":
+		velocity = velocity.lerp(safe_velocity, 0.2)
+	
+	if velocity.length() != 0:
+		sprite.flip_h = velocity.x < 0
+	
 	move_and_slide()
-	
-	if state_machine.current() and state_machine.current().state_name == "struggle": return
-	if velocity.length() <= 1: anim.play("idle")
-	else: anim.play("run")
 
 func toggle_zones(enabled: bool, ... zones: Array) -> void:
 	for z in zones:
@@ -101,12 +115,17 @@ func _is_path_clear(destination: Vector2) -> bool:
 	check.force_raycast_update()
 	return not check.is_colliding()
 
+func set_spd(amount: float) -> void:
+	_spd = amount
+
 func pick_destination(
 	attempts: int,
 	max_distance: float,
 	min_distance: float = 0.0,
 	target_pos: Vector2 = Vector2.ZERO,
 	flee: bool = true) -> Vector2:
+	
+	set_spd(move_speed * randf_range(0.5, 1.5))
 	
 	var angle : float = randf() * TAU
 	

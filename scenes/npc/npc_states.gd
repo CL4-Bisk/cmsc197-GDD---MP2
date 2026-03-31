@@ -39,7 +39,7 @@ class Idle extends GameState:
 		handler.state_machine.change(&"wander")
 	
 	func update(_delta: float) -> String:
-		handler.velocity = handler.velocity.lerp(Vector2.ZERO, 0.1)
+		handler.velocity = Vector2.ZERO
 		return ""
 	
 	func end() -> String:
@@ -118,6 +118,7 @@ class Chase extends GameState:
 		handler.state_machine.change(&"flee")
 	
 	func interest_detected(body: Node2D) -> void:
+		if handler.behavior == NPC.Behavior.CHARMED: return
 		handler.target = body
 		start()
 

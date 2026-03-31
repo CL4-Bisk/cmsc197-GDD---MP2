@@ -8,6 +8,7 @@ class_name Player
 
 @onready var anim: AnimationPlayer = $AnimationPlayer
 @onready var sprite: Sprite2D = $Sprite2D
+@onready var nav2d: NavigationObstacle2D = $Nav2D
 @onready var hit_box: CollisionShape2D = $HitBox
 
 @export var move_speed : float = 250.0
