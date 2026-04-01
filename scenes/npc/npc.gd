@@ -19,8 +19,7 @@ class_name NPC
 @export_category("Dynamic Parameters")
 @export var move_speed : float = 100.0
 @export var life_force : float = 10.0
-@export var vigilance : float = 15
-var reduc_rate : float = 0
+var vigilance : float = 0.0
 
 @export_category("Fixed Parameters")
 @export var wait_time : float = 4.0
@@ -34,17 +33,19 @@ enum Behavior {
 	TERRIFIED,	# 1/20
 	DRAINED, 
 }
-@export var behavior : Behavior
+@export var behavior : Behavior = Behavior.SOBER
 @export var mult : Dictionary[Behavior, Vector2] = {
 	Behavior.CHARMED: Vector2(2, 0),
 	Behavior.DULLED: Vector2(1, 15),
-	Behavior.SOBER: Vector2(1/1.5, 50),
-	Behavior.ALERT: Vector2(1.0/2, 75),
-	Behavior.ALARMED: Vector2(1.0/3, 99),
-	Behavior.TERRIFIED: Vector2(1.0/5, 100),
+	Behavior.SOBER: Vector2(1.0/2, 50),
+	Behavior.ALERT: Vector2(1.0/5, 75),
+	Behavior.ALARMED: Vector2(1.0/10, 99),
+	Behavior.TERRIFIED: Vector2(1.0/25, 100),
 }
 
 func _ready() -> void:
+	vigilance = mult.get(behavior).y
+	modify_vigilance(0)
 	
 	state_machine.handler = self
 	state_machine.register_state(&"idle", NPCStates.Idle)
@@ -64,12 +65,17 @@ func start_state(state_name: StringName = &"") -> void:
 
 var spd_mult : float = 1.0
 var _spd : float
+
+# the rate at which vigilance decreases when in charm zone
+var _charm_rate : float = 0.0
+# the rate at which lifeforce decreases when fed on
+var drain_rate : float = 0.0
+
 var stage : Stage
 var offender : Node2D
 var target : Node2D
 
 func _physics_process(_delta: float) -> void:
-	#print(Behavior.find_key(behavior), reduc_rate)
 	#print(state_machine.stack.map(func(x): return x.state_name))
 	update_indicators()
 	
@@ -145,32 +151,27 @@ func pick_destination(
 		return closest
 	else:
 		return pick_destination(attempts-1, max_distance, min_distance, target_pos, flee)
+func update_indicators() -> void:
+	$VigilanceInd.text = str(ceili(vigilance))
+	$LifeForceInd.text = str(ceili(life_force))
+	if state_machine.current(): $StateInd.text = state_machine.current().state_name
 
 func modify_vigilance(amount: float) -> void:
 	vigilance = max(0, vigilance + amount)
 	for i in mult.keys():
 		var comparison = mult[i].y
-		
 		if vigilance <= comparison:
+			drain_rate = mult[i].x
 			behavior = i
 			break
 
-func update_indicators() -> void:
-	$VigilanceInd.text = str(ceili(vigilance))
-	$LifeForceInd.text = str(ceili(life_force))
-	if state_machine.current():
-		$StateInd.text = state_machine.current().state_name
-
-func receive_charm(amount: float) -> void:
-	reduc_rate = amount * mult[behavior].x
-	if amount > 0:
+func receive_charm(amount: float = 0.0) -> void:
+	if amount > 0.0:
+		_charm_rate = amount
 		tick_rate.start()
-	else:
-		tick_rate.stop()
+	else: tick_rate.stop()
 
-func reduce_vigilance() -> void:
-	reduc_rate = mult[behavior].x
-	modify_vigilance(-(2 * reduc_rate))
+func _reduce_vigilance() -> void: modify_vigilance(-_charm_rate)
 
 func _on_detection_body_entered(body: Node2D) -> void:
 	if body == self: return

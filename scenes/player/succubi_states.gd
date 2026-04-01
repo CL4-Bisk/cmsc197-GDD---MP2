@@ -68,7 +68,6 @@ class Feeding extends GameState:
 			t = handler.create_tween()
 			t.tween_property(handler, "global_position", feeding_target.global_position, 0.1)
 		
-			feeding_target.reduc_rate = handler.charm_power
 			feeding_target.state_machine.change(&"struggle")
 		return ""
 	
@@ -77,8 +76,8 @@ class Feeding extends GameState:
 		return &"repeat"
 		
 	func update(delta: float) -> String:
-		handler.total_life_force += feeding_target.reduc_rate * delta
-		handler.life_force += feeding_target.reduc_rate * delta
+		handler.total_life_force += feeding_target.drain_rate * delta
+		handler.life_force += feeding_target.drain_rate * delta
 		
 		if Input.is_action_just_pressed(&"feed"): 
 			feeding_target.state_machine.back()

@@ -234,7 +234,7 @@ target_position = Vector2(0, 0)
 collision_mask = 2
 
 [connection signal="velocity_computed" from="Nav2D" to="." method="_on_nav_2d_velocity_computed"]
-[connection signal="timeout" from="TickRate" to="." method="reduce_vigilance"]
+[connection signal="timeout" from="TickRate" to="." method="_reduce_vigilance"]
 [connection signal="body_entered" from="Detection" to="." method="_on_detection_body_entered"]
 [connection signal="body_exited" from="Comfort" to="." method="_on_comfort_body_exited"]
 [connection signal="body_entered" from="Sensitive" to="." method="_on_sensitive_body_entered"]

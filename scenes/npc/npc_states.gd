@@ -162,7 +162,7 @@ class Struggle extends GameState:
 	
 	func update(delta: float) -> String:
 		if handler.nav2d.is_navigation_finished(): handler.nav2d.target_position = _distance()
-		handler.life_force -= handler.reduc_rate * delta
+		handler.life_force -= handler.drain_rate * delta
 		handler.update_indicators()
 		if handler.life_force <= 0:
 			handler.state_machine.refresh()
