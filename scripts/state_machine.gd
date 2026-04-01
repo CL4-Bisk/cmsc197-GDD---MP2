@@ -1,5 +1,5 @@
 extends Node
-class_name GameStateMachine
+class_name StateMachine
 
 var handler
 

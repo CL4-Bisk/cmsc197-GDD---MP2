@@ -1,4 +1,4 @@
-extends RefCounted
+extends GDScript
 class_name SucccubiStates
 
 class Normal extends GameState:

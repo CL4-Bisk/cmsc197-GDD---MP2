@@ -1,4 +1,4 @@
-extends RefCounted
+extends GDScript
 class_name NPCStates
 
 class Idle extends GameState:
@@ -16,7 +16,6 @@ class Idle extends GameState:
 	
 	func begin() -> String:
 		handler.state_machine.refresh()
-		
 		handler.sensitive.set_collision_mask_value(3, true)
 		handler.anim.play(&"idle")
 		
@@ -65,9 +64,8 @@ class Wander extends GameState:
 	
 	func begin() -> String:
 		handler.sensitive.set_collision_mask_value(3, false)
-		
 		var o = handler.d_zone.shape.radius * handler.scale.x
-		handler.nav2d.target_position = handler.pick_destination(10, o)
+		handler.nav2d.target_position = handler.pick_destination(50, o)
 		return ""
 	
 	func update(_delta: float) -> String:
@@ -88,7 +86,7 @@ class Flee extends GameState:
 		var t = handler.offender.global_position
 		
 		for a in range(50):
-			var potential_destination = handler.pick_destination(10, o, i, t)
+			var potential_destination = handler.pick_destination(50, o, i, t)
 			
 			var is_safe = not Geometry2D.is_point_in_circle(t, potential_destination, i)
 			
@@ -130,7 +128,7 @@ class Chase extends GameState:
 		var t = handler.target.global_position
 		
 		for a in range(50):
-			var potential_destination = handler.pick_destination(10, o, 0, t, false)
+			var potential_destination = handler.pick_destination(50, o, 0, t, false)
 			var in_range = Geometry2D.is_point_in_circle(t, potential_destination, o)
 			if in_range: return potential_destination
 		return handler.global_position + (handler.target.global_position - handler.global_position)
@@ -150,7 +148,7 @@ class Struggle extends GameState:
 	
 	func _distance() -> Vector2:
 		var radius = handler.c_zone.shape.radius * handler.scale.x
-		return handler.pick_destination(10, radius)
+		return handler.pick_destination(50, radius)
 	
 	func start() -> String:
 		handler.toggle_zones(false, handler.sensitive)
@@ -183,6 +181,8 @@ class Husk extends GameState:
 		handler.state_machine.refresh()
 		handler.toggle_zones(false, handler.sensitive, handler.comfort, handler.detection)
 		
+		handler.nav2d.set_avoidance_mask_value(1, false)
+		handler.nav2d.set_avoidance_mask_value(2, false)
 		handler.nav2d.target_position = handler.global_position
 		
 		handler.velocity = Vector2.ZERO

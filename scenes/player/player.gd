@@ -1,7 +1,7 @@
 extends CharacterBody2D
 class_name Player
 
-@onready var state_machine: GameStateMachine = $StateMachine
+@onready var state_machine: StateMachine = $StateMachine
 @onready var charm_zone: CollisionShape2D = $Charm/Zone
 @onready var feed_zone: Area2D = $Feed
 @onready var check: RayCast2D = $Check
@@ -18,12 +18,12 @@ class_name Player
 @export var life_force : float = 40.0
 @export var total_life_force : float = 40.0
 
+
 var is_mouse_inside : bool = false
 var spd_mult : float = 1.0
 
 func _ready() -> void:
 	state_machine.handler = self
-	
 	state_machine.register_state(&"normal", SucccubiStates.Normal)
 	state_machine.register_state(&"charm", SucccubiStates.Charming)
 	state_machine.register_state(&"feed", SucccubiStates.Feeding)

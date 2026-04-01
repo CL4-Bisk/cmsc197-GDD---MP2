@@ -1,9 +1,9 @@
 [gd_scene format=3 uid="uid://cnhhuinpwfj71"]
 
-[ext_resource type="Script" uid="uid://54b7wyrfkm5i" path="res://scenes/stage.gd" id="1_kewym"]
-[ext_resource type="PackedScene" uid="uid://0vtdhdrxcgxi" path="res://scenes/npc/npc.tscn" id="2_6c5u0"]
-[ext_resource type="Script" uid="uid://dd5dga64x7gje" path="res://scripts/camera.gd" id="2_vcsse"]
-[ext_resource type="PackedScene" uid="uid://cyxatyrapq250" path="res://scenes/player/player.tscn" id="3_vcsse"]
+[ext_resource type="Script" uid="uid://54b7wyrfkm5i" path="res://scenes/stages/stage.gd" id="1_5nho0"]
+[ext_resource type="PackedScene" uid="uid://0vtdhdrxcgxi" path="res://scenes/npc/npc.tscn" id="2_w2nqg"]
+[ext_resource type="Script" uid="uid://dd5dga64x7gje" path="res://scripts/camera.gd" id="3_0ia8g"]
+[ext_resource type="PackedScene" uid="uid://cyxatyrapq250" path="res://scenes/player/player.tscn" id="4_x8uq7"]
 
 [sub_resource type="NavigationPolygon" id="NavigationPolygon_6c5u0"]
 vertices = PackedVector2Array(494, 493, -493.02344, 493, -494, -1.0234375, -494, -495, 494, -495)
@@ -22,8 +22,8 @@ size = Vector2(94, 660)
 normal = Vector2(0, 1)
 
 [node name="Stage" type="Node" unique_id=1737466017]
-script = ExtResource("1_kewym")
-npc_scene = ExtResource("2_6c5u0")
+script = ExtResource("1_5nho0")
+npc_scene = ExtResource("2_w2nqg")
 
 [node name="Map" type="Node" parent="." unique_id=1861578752]
 
@@ -36,13 +36,16 @@ navigation_polygon = SubResource("NavigationPolygon_vcsse")
 navigation_layers = 4
 
 [node name="AccessZones" type="Area2D" parent="." unique_id=867218274]
+z_index = -3
 collision_layer = 16
 
 [node name="Left" type="CollisionShape2D" parent="AccessZones" unique_id=1360453075]
+show_behind_parent = true
 position = Vector2(-750, 0)
 shape = SubResource("RectangleShape2D_6c5u0")
 
 [node name="Right" type="CollisionShape2D" parent="AccessZones" unique_id=864354735]
+show_behind_parent = true
 position = Vector2(750, 0)
 shape = SubResource("RectangleShape2D_6c5u0")
 
@@ -79,7 +82,7 @@ process_callback = 0
 limit_enabled = false
 limit_smoothed = true
 position_smoothing_enabled = true
-script = ExtResource("2_vcsse")
+script = ExtResource("3_0ia8g")
 target = NodePath("../Player")
 
-[node name="Player" parent="." unique_id=1028600786 instance=ExtResource("3_vcsse")]
+[node name="Player" parent="." unique_id=1028600786 instance=ExtResource("4_x8uq7")]

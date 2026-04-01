@@ -1,11 +1,10 @@
 extends CharacterBody2D
 class_name NPC
 
-@onready var state_machine: GameStateMachine = $StateMachine
+@onready var state_machine: StateMachine = $StateMachine
 @onready var anim: AnimationPlayer = $AnimationPlayer
 @onready var sprite: Sprite2D = $Sprite2D
 @onready var nav2d: NavigationAgent2D = $Nav2D
-
 @onready var tick_rate: Timer = $TickRate
 
 # detectors
@@ -127,14 +126,11 @@ func set_spd(amount: float) -> void:
 	_spd = amount
 
 func pick_destination(
-	attempts: int,
-	max_distance: float,
-	min_distance: float = 0.0,
-	target_pos: Vector2 = Vector2.ZERO,
-	flee: bool = true) -> Vector2:
+	attempts: int, max_distance: float, min_distance: float = 0.0,
+	target_pos: Vector2 = Vector2.ZERO, flee: bool = true) -> Vector2:
 	
+	# randomly set move speed to destination
 	set_spd(move_speed * randf_range(0.5, 1.5))
-	
 	var angle : float = randf() * TAU
 	
 	if target_pos and attempts > 0:
@@ -147,10 +143,11 @@ func pick_destination(
 	
 	var map = get_world_2d().navigation_map
 	var closest = NavigationServer2D.map_get_closest_point(map, final_pos)
-	if _is_path_clear(closest - global_position):
-		return closest
-	else:
-		return pick_destination(attempts-1, max_distance, min_distance, target_pos, flee)
+	
+	if _is_path_clear(closest - global_position): return closest
+	else: return pick_destination(attempts-1, 
+			max_distance, min_distance, target_pos, flee)
+
 func update_indicators() -> void:
 	$VigilanceInd.text = str(ceili(vigilance))
 	$LifeForceInd.text = str(ceili(life_force))

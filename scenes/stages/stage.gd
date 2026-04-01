@@ -7,7 +7,7 @@ class_name Stage
 @export var npc_scene : PackedScene
 @onready var base_map: NavigationRegion2D = $Map/BaseMap
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	if Input.is_action_just_pressed("spawn"):
 		spawn_npc()
 
