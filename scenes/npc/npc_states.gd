@@ -41,6 +41,13 @@ class Idle extends GameState:
 		handler.state_machine.change(&"wander")
 	
 	func update(_delta: float) -> String:
+		match handler.behavior:
+			NPC.Behavior.TERRIFIED: handler.state_machine.change(&"exit")
+			NPC.Behavior.ALARMED:
+				if handler.detection.overlaps_body(handler.offender):
+					if handler.offender is Player:
+						threat_detected(handler.offender)
+		
 		handler.velocity = Vector2.ZERO
 		return ""
 	

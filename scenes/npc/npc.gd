@@ -177,7 +177,8 @@ func _on_detection_body_entered(body: Node2D) -> void:
 	
 	if body is Player:
 		match behavior:
-			Behavior.TERRIFIED: 
+			Behavior.TERRIFIED: state_machine.change(&"exit")
+			Behavior.ALARMED:
 				if current_state.has_method(&"threat_detected"):
 					current_state.threat_detected(body)
 			var n when n <= Behavior.DULLED: 
@@ -190,6 +191,9 @@ func _on_comfort_body_exited(body: Node2D) -> void:
 	
 	if body is Player:
 		match behavior:
+			Behavior.ALARMED:
+				if current_state.has_method(&"threat_detected"):
+					current_state.threat_detected(body)
 			var n when n <= Behavior.DULLED: 
 				if current_state.has_method(&"interest_detected"):
 					current_state.interest_detected(body)
