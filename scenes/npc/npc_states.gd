@@ -70,6 +70,7 @@ class Wander extends GameState:
 		handler.state_machine.change(&"chase")
 	
 	func begin() -> String:
+		handler.anim.play(&"run")
 		handler.sensitive.set_collision_mask_value(3, false)
 		var o = handler.d_zone.shape.radius * handler.scale.x
 		handler.nav2d.target_position = handler.pick_destination(50, o)
@@ -101,6 +102,7 @@ class Flee extends GameState:
 		return handler.global_position + (handler.global_position - t)
 	
 	func begin() -> String:
+		handler.anim.play(&"flee")
 		handler.toggle_zones(false, handler.comfort)
 		handler.spd_mult = 1.5
 		handler.sensitive.set_collision_mask_value(3, false)
@@ -158,9 +160,9 @@ class Struggle extends GameState:
 		return handler.pick_destination(50, radius)
 	
 	func start() -> String:
-		handler.toggle_zones(false, handler.sensitive)
+		handler.toggle_zones(false, handler.sensitive, handler.sighting)
 		handler.spd_mult = 0.75
-		handler.anim.play("struggle")
+		handler.anim.play("flee")
 		handler.nav2d.target_position = _distance()
 		handler.set_collision_mask_value(1, false)
 		return ""
@@ -172,25 +174,25 @@ class Struggle extends GameState:
 		if handler.life_force <= 0:
 			handler.state_machine.refresh()
 			return &"husk"
-		
 		return ""
 	
 	func finish() -> void:
 		handler.spd_mult = 1.0
-		handler.toggle_zones(true, handler.sensitive)
+		handler.toggle_zones(true, handler.sensitive, handler.sighting)
 
 class Husk extends GameState:
 	var handler : NPC
 	func _init() -> void: state_name = &"husk"
 	
 	func start() -> String:
-		handler.spd_mult = 0.5
+		handler.spd_mult = 0.3
 		handler.state_machine.refresh()
 		handler.toggle_zones(false, handler.sensitive, handler.comfort, handler.detection)
 		
 		handler.nav2d.set_avoidance_mask_value(1, false)
 		handler.nav2d.set_avoidance_mask_value(2, false)
 		handler.nav2d.target_position = handler.global_position
+		handler.behavior = NPC.Behavior.DRAINED
 		
 		handler.velocity = Vector2.ZERO
 		handler.set_spd(100)
@@ -218,6 +220,7 @@ class Enter extends GameState:
 		handler.set_spd(handler.move_speed)
 		handler.nav2d.set_navigation_layer_value(3, true)
 		handler.nav2d.set_navigation_layer_value(1, false)
+		handler.anim.play(&"run")
 		return ""
 	
 	func update(_delta: float) -> String:
@@ -247,6 +250,10 @@ class Exit extends GameState:
 		handler.nav2d.target_position = handler.stage.pick_access_point()
 		handler.nav2d.set_navigation_layer_value(3, true)
 		handler.nav2d.set_navigation_layer_value(1, false)
+		match handler.behavior:
+			NPC.Behavior.DRAINED: handler.anim.play(&"husk")
+			NPC.Behavior.TERRIFIED: handler.anim.play(&"flee")
+			_: handler.anim.play(&"run")
 		return ""
 		
 	func update(_delta: float) -> String:

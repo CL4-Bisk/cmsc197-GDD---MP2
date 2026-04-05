@@ -13,6 +13,8 @@ class_name NPC
 @onready var comfort: Area2D = $Comfort
 @onready var c_zone: CollisionShape2D = $Comfort/Zone
 @onready var sensitive: Area2D = $Sensitive
+@onready var sight: Area2D = $Sight
+@onready var sighting: CollisionPolygon2D = $Sight/Sighting
 @onready var check: RayCast2D = $Check
 
 @export_category("Dynamic Parameters")
@@ -77,11 +79,11 @@ var target : Node2D
 func _physics_process(_delta: float) -> void:
 	#print(state_machine.stack.map(func(x): return x.state_name))
 	update_indicators()
-	
+
 	navigate()
+	move_and_slide()
+	if velocity.length() != 0: sprite.flip_h = velocity.x < 0
 	if state_machine.current() and state_machine.current().state_name == "struggle": return
-	if velocity.length() <= 1: anim.play("idle")
-	else: anim.play("run")
 
 func navigate() -> void:
 	var target_vel = Vector2.ZERO
@@ -96,21 +98,19 @@ func navigate() -> void:
 		var arrival_mult = clamp(dis / 100.0, 0, 1.0)
 		
 		target_vel = dir * _spd * spd_mult * arrival_mult
-		sprite.flip_h = dir.x < 0
+		sight.look_at(next_path_pos)
 		
 	check.force_raycast_update()
-	nav2d.set_velocity(target_vel)
+	if sight.has_overlapping_bodies(): nav2d.set_velocity(target_vel)
+	else: velocity = velocity.lerp(target_vel, 0.1)
 
 func _on_nav_2d_velocity_computed(safe_velocity: Vector2) -> void:
 	if state_machine.current() == null: return
-	
+	if not sight.has_overlapping_bodies(): return
 	if state_machine.current().state_name != &"idle":
-		velocity = velocity.lerp(safe_velocity, 0.2)
+		velocity = velocity.lerp(safe_velocity, 0.1)
 	
-	if velocity.length() != 0:
-		sprite.flip_h = velocity.x < 0
 	
-	move_and_slide()
 
 func toggle_zones(enabled: bool, ... zones: Array) -> void:
 	for z in zones:
@@ -130,7 +130,7 @@ func pick_destination(
 	target_pos: Vector2 = Vector2.ZERO, flee: bool = true) -> Vector2:
 	
 	# randomly set move speed to destination
-	set_spd(move_speed * randf_range(0.5, 1.5))
+	set_spd(move_speed * randf_range(0.9, 1.1))
 	var angle : float = randf() * TAU
 	
 	if target_pos and attempts > 0:
@@ -155,12 +155,16 @@ func update_indicators() -> void:
 
 func modify_vigilance(amount: float) -> void:
 	vigilance = max(0, vigilance + amount)
+	if life_force == 0: 
+		behavior = Behavior.DRAINED
+		return
+		
 	for i in mult.keys():
 		var comparison = mult[i].y
 		if vigilance <= comparison:
 			drain_rate = mult[i].x
 			behavior = i
-			break
+			return
 
 func receive_charm(amount: float = 0.0) -> void:
 	if amount > 0.0:

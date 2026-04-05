@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://drkmknxy1l0g0" path="res://scenes/npc/npc.gd" id="1_0lqhn"]
 [ext_resource type="Script" uid="uid://d0injnhv64s4a" path="res://scripts/state_machine.gd" id="2_41bpm"]
-[ext_resource type="Texture2D" uid="uid://dcwja301mrl4e" path="res://assets/player_sheet.png" id="3_hjpoh"]
+[ext_resource type="Texture2D" uid="uid://b1o3dvelbk807" path="res://assets/npc_var1.png" id="3_r4bp4"]
 
 [sub_resource type="Animation" id="Animation_vmepk"]
 length = 0.001
@@ -16,12 +16,12 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [7]
+"values": [8]
 }
 
-[sub_resource type="Animation" id="Animation_8yqb7"]
-resource_name = "feed"
-length = 0.2
+[sub_resource type="Animation" id="Animation_0lqhn"]
+resource_name = "flee"
+length = 0.6
 loop_mode = 1
 tracks/0/type = "value"
 tracks/0/imported = false
@@ -30,15 +30,32 @@ tracks/0/path = NodePath("Sprite2D:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.2),
+"times": PackedFloat32Array(0, 0.6),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
-"values": [3, 4]
+"values": [25, 32]
+}
+
+[sub_resource type="Animation" id="Animation_8yqb7"]
+resource_name = "husk"
+length = 1.2
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1.2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0, 7]
 }
 
 [sub_resource type="Animation" id="Animation_q4x0c"]
 resource_name = "idle"
-length = 0.4
+length = 0.6
 loop_mode = 1
 tracks/0/type = "value"
 tracks/0/imported = false
@@ -47,15 +64,15 @@ tracks/0/path = NodePath("Sprite2D:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.4),
+"times": PackedFloat32Array(0, 0.6),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
-"values": [7, 10]
+"values": [8, 16]
 }
 
 [sub_resource type="Animation" id="Animation_paujj"]
 resource_name = "run"
-length = 0.5
+length = 0.6
 loop_mode = 1
 tracks/0/type = "value"
 tracks/0/imported = false
@@ -64,36 +81,19 @@ tracks/0/path = NodePath("Sprite2D:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.5),
+"times": PackedFloat32Array(0, 0.6),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
-"values": [13, 18]
-}
-
-[sub_resource type="Animation" id="Animation_0lqhn"]
-resource_name = "struggle"
-length = 0.2
-loop_mode = 1
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Sprite2D:frame")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.2),
-"transitions": PackedFloat32Array(1, 1),
-"update": 0,
-"values": [5, 6]
+"values": [17, 24]
 }
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_0lqhn"]
 _data = {
 &"RESET": SubResource("Animation_vmepk"),
-&"feed": SubResource("Animation_8yqb7"),
+&"flee": SubResource("Animation_0lqhn"),
+&"husk": SubResource("Animation_8yqb7"),
 &"idle": SubResource("Animation_q4x0c"),
-&"run": SubResource("Animation_paujj"),
-&"struggle": SubResource("Animation_0lqhn")
+&"run": SubResource("Animation_paujj")
 }
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_cqiqx"]
@@ -114,14 +114,13 @@ radius = 13.333334
 height = 30.666668
 
 [node name="NPC" type="CharacterBody2D" unique_id=1043865114]
-scale = Vector2(1.5, 1.5)
 collision_layer = 4
 collision_mask = 7
 motion_mode = 1
 script = ExtResource("1_0lqhn")
-move_speed = 200.0
+move_speed = 50.0
 life_force = 5.0
-behavior = 3
+behavior = 1
 metadata/_edit_group_ = true
 
 [node name="StateMachine" type="Node" parent="." unique_id=520582749]
@@ -130,12 +129,10 @@ script = ExtResource("2_41bpm")
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1592087076]
 libraries/ = SubResource("AnimationLibrary_0lqhn")
 
-[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1088635542]
-z_index = 1
-position = Vector2(0, -4)
-texture = ExtResource("3_hjpoh")
-hframes = 19
-frame = 7
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1625813020]
+texture = ExtResource("3_r4bp4")
+hframes = 33
+frame = 8
 
 [node name="HitBox" type="CollisionShape2D" parent="." unique_id=906811026]
 z_index = 1
@@ -232,6 +229,11 @@ monitorable = false
 [node name="Zone" type="CollisionShape2D" parent="Sensitive" unique_id=196461142]
 shape = SubResource("CapsuleShape2D_dpyoa")
 debug_color = Color(0.8235294, 0.37254903, 0.39607844, 0.5176471)
+
+[node name="Sight" type="Area2D" parent="." unique_id=1942803935]
+
+[node name="Sighting" type="CollisionPolygon2D" parent="Sight" unique_id=155142021]
+polygon = PackedVector2Array(80, -40, 0, -5, 0, 5, 80, 40)
 
 [node name="Check" type="RayCast2D" parent="." unique_id=1839204777]
 target_position = Vector2(0, 0)
