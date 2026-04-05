@@ -1,10 +1,10 @@
 [gd_scene format=3 uid="uid://cyxatyrapq250"]
 
 [ext_resource type="Script" uid="uid://rwu1opexsj8d" path="res://scenes/player/player.gd" id="1_cqiqx"]
-[ext_resource type="Texture2D" uid="uid://dcwja301mrl4e" path="res://assets/player_sheet.png" id="1_xc6nl"]
 [ext_resource type="Script" uid="uid://d0injnhv64s4a" path="res://scripts/state_machine.gd" id="2_vmepk"]
+[ext_resource type="Texture2D" uid="uid://joie7qrccm4b" path="res://assets/succubus/succubus_player.png" id="3_gmlin"]
 
-[sub_resource type="Animation" id="Animation_vmepk"]
+[sub_resource type="Animation" id="Animation_gmlin"]
 length = 0.001
 tracks/0/type = "value"
 tracks/0/imported = false
@@ -16,13 +16,11 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [7]
+"values": [0]
 }
 
-[sub_resource type="Animation" id="Animation_8yqb7"]
-resource_name = "feed"
-length = 0.2
-loop_mode = 1
+[sub_resource type="Animation" id="Animation_75vfm"]
+resource_name = "dead"
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
@@ -30,15 +28,31 @@ tracks/0/path = NodePath("Sprite2D:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.2),
-"transitions": PackedFloat32Array(1, 1),
+"times": PackedFloat32Array(0, 0.15, 0.3, 1),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
 "update": 0,
-"values": [3, 4]
+"values": [36, 38, 37, 45]
 }
 
-[sub_resource type="Animation" id="Animation_q4x0c"]
+[sub_resource type="Animation" id="Animation_0owmy"]
+resource_name = "hit"
+length = 0.6
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.6),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [30, 36]
+}
+
+[sub_resource type="Animation" id="Animation_lvxji"]
 resource_name = "idle"
-length = 0.4
+length = 0.6
 loop_mode = 1
 tracks/0/type = "value"
 tracks/0/imported = false
@@ -47,15 +61,32 @@ tracks/0/path = NodePath("Sprite2D:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.4),
+"times": PackedFloat32Array(0, 0.6),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
-"values": [7, 10]
+"values": [0, 6]
 }
 
-[sub_resource type="Animation" id="Animation_paujj"]
+[sub_resource type="Animation" id="Animation_qek5x"]
+resource_name = "idle_demon"
+length = 0.6
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.6),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [7, 13]
+}
+
+[sub_resource type="Animation" id="Animation_p47bc"]
 resource_name = "run"
-length = 0.5
+length = 0.6
 loop_mode = 1
 tracks/0/type = "value"
 tracks/0/imported = false
@@ -64,18 +95,38 @@ tracks/0/path = NodePath("Sprite2D:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.5),
+"times": PackedFloat32Array(0, 0.6),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
-"values": [13, 18]
+"values": [14, 21]
 }
 
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_paujj"]
+[sub_resource type="Animation" id="Animation_5gtgg"]
+resource_name = "run_demon"
+length = 0.6
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.6),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [22, 29]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_p47bc"]
 _data = {
-&"RESET": SubResource("Animation_vmepk"),
-&"feed": SubResource("Animation_8yqb7"),
-&"idle": SubResource("Animation_q4x0c"),
-&"run": SubResource("Animation_paujj")
+&"RESET": SubResource("Animation_gmlin"),
+&"dead": SubResource("Animation_75vfm"),
+&"hit": SubResource("Animation_0owmy"),
+&"idle": SubResource("Animation_lvxji"),
+&"idle_demon": SubResource("Animation_qek5x"),
+&"run": SubResource("Animation_p47bc"),
+&"run_demon": SubResource("Animation_5gtgg")
 }
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_cqiqx"]
@@ -93,7 +144,6 @@ radius = 32.0
 
 [node name="Player" type="CharacterBody2D" unique_id=1043865114]
 z_index = -1
-scale = Vector2(1.5, 1.5)
 collision_mask = 14
 motion_mode = 1
 script = ExtResource("1_cqiqx")
@@ -102,20 +152,22 @@ metadata/_edit_group_ = true
 [node name="StateMachine" type="Node" parent="." unique_id=520582749]
 script = ExtResource("2_vmepk")
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=474085319]
-libraries/ = SubResource("AnimationLibrary_paujj")
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=761262257]
+texture = ExtResource("3_gmlin")
+hframes = 7
+vframes = 7
 
-[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1088635542]
-z_index = 1
-position = Vector2(0, -4)
-texture = ExtResource("1_xc6nl")
-hframes = 19
-frame = 7
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=2133244995]
+libraries/ = SubResource("AnimationLibrary_p47bc")
 
 [node name="Nav2D" type="NavigationObstacle2D" parent="." unique_id=1563589754]
 radius = 5.0
 affect_navigation_mesh = true
 carve_navigation_mesh = true
+
+[node name="DemonTimer" type="Timer" parent="." unique_id=1676745639]
+wait_time = 10.0
+one_shot = true
 
 [node name="HitBox" type="CollisionShape2D" parent="." unique_id=906811026]
 z_index = 2
@@ -153,6 +205,7 @@ debug_color = Color(0.7770559, 0.42953065, 0.26532078, 0.28235295)
 [node name="Check" type="RayCast2D" parent="." unique_id=943925329]
 collision_mask = 2
 
+[connection signal="timeout" from="DemonTimer" to="." method="end_demon_time"]
 [connection signal="body_entered" from="Charm" to="." method="_on_charm" binds= [true]]
 [connection signal="body_exited" from="Charm" to="." method="_on_charm" binds= [false]]
 [connection signal="mouse_exited" from="Chase" to="." method="mouse_detect" binds= [false]]

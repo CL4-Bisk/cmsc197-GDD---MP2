@@ -12,7 +12,7 @@ class Normal extends GameState:
 		return ""
 	
 	func update(_delta: float) -> String:
-		if Input.is_action_just_pressed(&"charm"):
+		if Input.is_action_just_pressed(&"charm"): 
 			return &"charm"
 		return ""
 
@@ -24,7 +24,6 @@ class Charming extends GameState:
 		state_name = &"charm"
 	
 	func begin() -> String:
-		handler.spd_mult = 0.5
 		handler.charm_zone.set_deferred("disabled", false)
 		
 		var s = (handler.charm_zone.shape as CircleShape2D)
@@ -35,11 +34,12 @@ class Charming extends GameState:
 		return ""
 	
 	func update(_delta: float) -> String:
-		if Input.is_action_just_released(&"charm"):
-			return &"pop"
+		if not handler.lustful: handler.spd_mult = 0.5
+		if Input.is_action_just_released(&"charm"): return &"pop"
 		return ""
 	
 	func finish() -> void:
+		if handler.state_machine.stack.is_empty(): handler.state_machine.change(&"normal")
 		handler.charm_zone.set_deferred("disabled", true)
 		if t and t.is_running(): t.kill()
 		(handler.charm_zone.shape as CircleShape2D).radius = handler.total_life_force
@@ -53,8 +53,6 @@ class Feeding extends GameState:
 		state_name = &"feed"
 	
 	func start() -> String:
-		handler.anim.play(&"feed")
-		handler.state_machine.refresh()
 		handler.spd_mult = 0
 		handler.hit_box.set_deferred(&"disabled", true)
 		handler.nav2d.avoidance_enabled = false
@@ -76,19 +74,27 @@ class Feeding extends GameState:
 		return &"repeat"
 		
 	func update(delta: float) -> String:
-		handler.total_life_force += feeding_target.drain_rate * delta
-		handler.life_force += feeding_target.drain_rate * delta
+		
+		var suck_power = feeding_target.drain_rate * delta \
+							* (2 if handler.lustful else 1)
+		
+		feeding_target.life_force -= suck_power
+		handler.total_life_force += suck_power
+		handler.life_force += suck_power
 		
 		if Input.is_action_just_pressed(&"feed"): 
 			feeding_target.state_machine.back()
 			return &"pop"
-		if feeding_target.life_force <= 0: return &"pop"
+		if feeding_target.life_force <= 0: 
+			handler.state_machine.back()
+			handler.state_machine.change(&"lust")
+			return ""
 		if t and t.is_running(): return ""
 		handler.global_position = feeding_target.global_position
 		return ""
 	
 	func finish() -> void:
-		handler.state_machine.change(&"normal")
+		if handler.state_machine.stack.is_empty(): handler.state_machine.change(&"normal")
 		handler.nav2d.avoidance_enabled = true
 		handler.hit_box.set_deferred("disabled", false)
 
@@ -99,8 +105,16 @@ class Lustful extends GameState:
 		state_name = &"lust"
 	
 	func start() -> String:
-			handler.spd_mult = 2.0
-			return ""
+		handler.spd_mult = 2.0
+		handler.lustful = true
+		handler.status = &"_demon"
+		handler.demon_timer.start()
+		return ""
+	
+	func update(_delta: float) -> String:
+		if Input.is_action_just_pressed(&"charm"): 
+			return &"charm"
+		return ""
 
 class Subjugated extends GameState:
 	var handler : Player
@@ -109,5 +123,6 @@ class Subjugated extends GameState:
 		state_name = &"dead"
 	
 	func start() -> String:
-		handler.spd_mult = 1.0
+		handler.spd_mult = 0.0
+		handler.anim.play(&"dead")
 		return ""
