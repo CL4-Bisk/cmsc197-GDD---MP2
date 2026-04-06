@@ -300,11 +300,6 @@ class AggroIdle extends GameState:
 		handler.state_machine.change(&"wander")
 	
 	func update(_delta: float) -> String:
-		if handler.detection.overlaps_body(handler.stage.player):
-			if handler.behavior > handler.Behavior.DULLED: 
-				threat_detected(handler.stage.player)
-			else: interest_detected(handler.stage.player)
-		
 		handler.velocity = Vector2.ZERO
 		return ""
 	
@@ -317,17 +312,26 @@ class AggroChase extends GameState:
 	func _init() -> void: state_name = &"threat"
 	
 	func begin() -> String:
+		if handler.sensitive.overlaps_body(handler.stage.player):
+			handler.state_machine.change(&"attack")
+			return &"repeat"
+		
 		handler.anim.play(&"run")
 		return ""
 	
 	func update(_delta: float) -> String:
 		if handler.detection.overlaps_body(handler.stage.player):
 			handler.nav2d.target_position = handler.stage.player.global_position
+			handler.hit.look_at(handler.nav2d.target_position)
 			return ""
 		
 		if handler.nav2d.is_navigation_finished():
 			return &"pop"
 		return ""
+	
+	func finish() -> void:
+		if handler.state_machine.stack.is_empty():
+			handler.change(&"idle")
 
 class Attack extends GameState:
 	var handler : NPC
@@ -335,5 +339,5 @@ class Attack extends GameState:
 	func start() -> String:
 		handler.velocity = Vector2.ZERO
 		handler.anim.play(&"hit")
-		handler.anim.animation_finished.connect(func(_x): handler.state_machine.back())
+		handler.anim.animation_finished.connect(func(_x): handler.state_machine.back(), CONNECT_ONE_SHOT)
 		return ""

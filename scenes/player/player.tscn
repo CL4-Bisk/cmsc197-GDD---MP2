@@ -190,6 +190,8 @@ carve_navigation_mesh = true
 wait_time = 10.0
 one_shot = true
 
+[node name="IFrameTimer" type="Timer" parent="." unique_id=191857992]
+
 [node name="HitBox" type="CollisionShape2D" parent="." unique_id=906811026]
 z_index = 2
 shape = SubResource("CapsuleShape2D_cqiqx")
@@ -263,6 +265,7 @@ hue_variation_min = -1.0
 hue_variation_max = 1.0
 
 [connection signal="timeout" from="DemonTimer" to="." method="end_demon_time"]
+[connection signal="timeout" from="IFrameTimer" to="." method="invul" binds= [false]]
 [connection signal="body_entered" from="Charm" to="." method="_on_charm" binds= [true]]
 [connection signal="body_exited" from="Charm" to="." method="_on_charm" binds= [false]]
 [connection signal="mouse_exited" from="Chase" to="." method="mouse_detect" binds= [false]]

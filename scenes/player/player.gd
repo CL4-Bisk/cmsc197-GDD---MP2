@@ -124,6 +124,11 @@ func find_nearest() -> Node2D:
 		
 	return nearest
 
+func invul(toggle: bool) -> void:
+	if lives <= 0: return
+	set_collision_layer_value(1, !toggle)
+	sprite.modulate.a = 0.5 if toggle else 1.0
+
 func mouse_detect(toggle: bool) -> void:
 	is_mouse_inside = toggle 
 

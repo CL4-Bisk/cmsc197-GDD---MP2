@@ -144,6 +144,10 @@ class Subjugated extends GameState:
 	func start() -> String:
 		handler.spd_mult = 0.0
 		handler.anim.play(&"dead")
+		handler.set_collision_layer_value(1, false)
+		handler.set_collision_mask_value(2, false)
+		handler.set_collision_mask_value(3, false)
+		handler.set_collision_mask_value(4, false)
 		return ""
 
 class Hit extends GameState:
@@ -152,16 +156,19 @@ class Hit extends GameState:
 	func _init() -> void: state_name = &"hit"
 	
 	func begin() -> String:
-		handler.anim.play(&"hit")
-		handler.anim.animation_finished.connect(
-			func(_x): handler.state_machine.back()
-		)
-		return ""
-	
-	func finish() -> void:
 		handler.lives -= 1
+		handler.set_collision_layer_value(1, false)
 		if handler.lives <= 0:
 			handler.player_dead.emit()
 			handler.state_machine.change(&"dead")
-			return
-		handler.state_machine.change(&"normal")
+			return ""
+		handler.invul(true)
+		handler.anim.play(&"hit")
+		handler.anim.animation_finished.connect(
+			func(_x): handler.state_machine.back()
+		, CONNECT_ONE_SHOT)
+		return ""
+	
+	func finish() -> void:
+		if handler.lives > 0:
+			handler.invul_timer.start()
