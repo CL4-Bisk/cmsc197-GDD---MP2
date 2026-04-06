@@ -6,6 +6,8 @@ signal feeding_start
 signal feeding_stop
 
 var game_started : bool = false
+signal xp_changed(exp: int, lvl: int)
+signal level_upped
 
 const AURA_SIZE : int = 40.0
 @onready var state_machine: StateMachine = $StateMachine
@@ -38,6 +40,7 @@ const AURA_SIZE : int = 40.0
 @export var popup_text : PackedScene
 
 var level : int = 1
+var exp : int = 0
 var status = ""
 var lustful : bool = false
 var is_mouse_inside : bool = false
@@ -54,6 +57,20 @@ func _ready() -> void:
 	
 	state_machine.change(&"normal")
 	state_machine._process_pending()
+
+func _get_xp_for_next_level() -> int:
+	return level * 100
+
+func add_experience(amount: int) -> void:
+	exp += amount
+	while exp >= _get_xp_for_next_level():
+		exp -= _get_xp_for_next_level()
+		level_up()
+	emit_signal("xp_changed", exp, level)
+
+func level_up() -> void:
+	level += 1
+	emit_signal("level_upped")
 
 func _physics_process(_delta: float) -> void:
 	if not game_started: return
@@ -152,3 +169,7 @@ func end_demon_time() -> void:
 func hit() -> void:
 	if lustful: return
 	state_machine.change(&"hit")
+
+func _on_player_dead() -> void:
+	await get_tree().create_timer(2.0).timeout
+	get_tree().change_scene_to_file("res://scenes/menu/game_over.tscn")

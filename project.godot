@@ -11,12 +11,13 @@ config_version=5
 [application]
 
 config/name="Machine Problem 2"
-run/main_scene="uid://cnhhuinpwfj71"
+run/main_scene="uid://dsb4pf56aymxp"
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://icon.svg"
 
 [display]
 
+window/size/mode=4
 window/size/minimize_disabled=true
 window/size/maximize_disabled=true
 window/stretch/mode="canvas_items"

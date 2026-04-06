@@ -1,0 +1,58 @@
+[gd_scene format=3 uid="uid://b004yyx3cnag8"]
+
+[ext_resource type="Script" path="res://scenes/menu/game_over.gd" id="1_govr"]
+
+[node name="GameOver" type="Node2D"]
+script = ExtResource("1_govr")
+
+[node name="Background" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.02, 0.01, 0.03, 0.95)
+
+[node name="Title" type="Label" parent="."]
+offset_left = 100.0
+offset_top = 100.0
+offset_right = 700.0
+offset_bottom = 180.0
+horizontal_alignment = 1
+vertical_alignment = 1
+text = "GAME OVER"
+add_theme_font_size_override("font_size", 56)
+add_theme_color_override("font_color", Color(0.9, 0.1, 0.2, 1))
+
+[node name="MenuContainer" type="VBoxContainer" parent="."]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -80.0
+offset_top = 0.0
+offset_right = 80.0
+offset_bottom = 150.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="Restart" type="Button" parent="MenuContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(160, 40)
+text = "Restart"
+add_theme_font_size_override("font_size", 18)
+
+[node name="MainMenu" type="Button" parent="MenuContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(160, 40)
+text = "Main Menu"
+add_theme_font_size_override("font_size", 18)
+
+[node name="Quit" type="Button" parent="MenuContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(160, 40)
+text = "Quit"
+add_theme_font_size_override("font_size", 18)

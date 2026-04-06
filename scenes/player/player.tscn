@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://rwu1opexsj8d" path="res://scenes/player/player.gd" id="1_cqiqx"]
 [ext_resource type="PackedScene" uid="uid://ullhdpquvp0e" path="res://scenes/popup.tscn" id="2_p47bc"]
+[ext_resource type="PackedScene" uid="uid://dgikx8u826ng7" path="res://scenes/stages/hud.tscn" id="2_p47bc"]
 [ext_resource type="Script" uid="uid://d0injnhv64s4a" path="res://scripts/state_machine.gd" id="2_vmepk"]
 [ext_resource type="Texture2D" uid="uid://joie7qrccm4b" path="res://assets/succubus/succubus_player.png" id="3_gmlin"]
 [ext_resource type="Shader" uid="uid://c6ta0bvb2af07" path="res://scenes/player/censor.gdshader" id="4_lvxji"]
@@ -170,6 +171,8 @@ level_threshold = Dictionary[int, float]({
 popup_text = ExtResource("2_p47bc")
 metadata/_edit_group_ = true
 
+[node name="HUD" parent="." unique_id=948591641 instance=ExtResource("2_p47bc")]
+
 [node name="StateMachine" type="Node" parent="." unique_id=520582749]
 script = ExtResource("2_vmepk")
 
@@ -264,6 +267,9 @@ color_ramp = SubResource("Gradient_p47bc")
 hue_variation_min = -1.0
 hue_variation_max = 1.0
 
+[connection signal="player_dead" from="." to="." method="_on_player_dead"]
+[connection signal="level_upped" from="." to="HUD" method="play_level_up"]
+[connection signal="xp_changed" from="." to="HUD" method="update_player_ui"]
 [connection signal="timeout" from="DemonTimer" to="." method="end_demon_time"]
 [connection signal="timeout" from="IFrameTimer" to="." method="invul" binds= [false]]
 [connection signal="body_entered" from="Charm" to="." method="_on_charm" binds= [true]]
