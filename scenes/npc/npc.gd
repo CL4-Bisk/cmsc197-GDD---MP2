@@ -17,6 +17,7 @@ class_name NPC
 @onready var sight: Area2D = $Sight
 @onready var sighting: CollisionPolygon2D = $Sight/Sighting
 @onready var check: RayCast2D = $Check
+@onready var audio: AudioStreamPlayer = $AudioStreamPlayer
 
 @export_category("NPC Parameters")
 @export var move_speed : float = 50.0
@@ -51,6 +52,12 @@ enum Behavior {
 	Behavior.TERRIFIED: 1.0/25,
 }
 
+@export var audio_scenes : Dictionary[int, AudioStream] = {
+	0: preload("res://assets/audio/Man screaming - Sound effect.mp3"),
+	1: preload("res://assets/audio/Man Screaming in Pain Sound Effect (HD) #meme #memes #dankmemes #soundeffects.mp3"),
+	2: preload("res://assets/audio/Man screaming sound effect  what is sound_  scream 1.mp3")
+}
+
 # dynamic
 var _spd : float
 var _charm_rate : float = 0.0
@@ -69,6 +76,7 @@ func _init() -> void:
 	vigilance = randf_range(ran.x, ran.y)
 
 func _ready() -> void:
+	nav2d.hide()
 	modify_vigilance(0)
 	state_machine.handler = self
 	state_machine.register_state(&"idle", NPCStates.Idle)
@@ -85,6 +93,27 @@ func start_state(state_name: StringName = &"") -> void:
 	if state_name != &"":
 		state_machine.change(state_name)
 	state_machine._process_pending()
+
+func play_scream_sound() -> void:
+	var x = randi_range(0, 2)
+	var stream_to_play = audio_scenes.get(x)
+	
+	print("Trying to play sound ID: ", x)
+	
+	if audio == null:
+		print("ERROR: AudioStreamPlayer node not found!")
+		return
+		
+	if stream_to_play:
+		audio.stream = stream_to_play
+		audio.play()
+		print("Audio node 'playing' status: ", audio.playing)
+	else:
+		print("ERROR: Stream not found in dictionary for ID: ", x)
+
+func _process(_delta):
+	if lifeforce <= 0 and audio.playing:
+		audio.stop() # Stops the loop immediately when they die
 
 func _physics_process(_delta: float) -> void:
 	#print(state_machine.stack.map(func(x): return x.state_name))

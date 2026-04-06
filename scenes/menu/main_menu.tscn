@@ -45,3 +45,5 @@ offset_top = 352.0
 offset_right = 610.0
 offset_bottom = 392.0
 text = "Quit"
+
+[node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="." unique_id=1968272762]

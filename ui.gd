@@ -15,8 +15,14 @@ signal start_game
 
 @onready var game_over_screen: MarginContainer = $GameOverScreen
 @onready var button: Button = $GameOverScreen/VBox/Button
+@onready var audio: AudioStreamPlayer = $AudioStreamPlayer
+
+func _ready() -> void:
+	audio.play()
 
 func start_game_pressed() -> void:
+	audio.stream = preload("res://assets/audio/stagemusic.wav")
+	audio.play()
 	title_screen.hide()
 	game_info.show()
 	start_game.emit()

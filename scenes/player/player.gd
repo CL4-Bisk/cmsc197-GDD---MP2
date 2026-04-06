@@ -6,8 +6,6 @@ signal feeding_start
 signal feeding_stop
 
 var game_started : bool = false
-signal xp_changed(exp: int, lvl: int)
-signal level_upped
 
 const AURA_SIZE : int = 40.0
 const STARVATION_DURATION: float = 10.0
@@ -45,7 +43,6 @@ const STARVATION_THRESHOLD: float = 0.0
 @export var popup_text : PackedScene
 
 var level : int = 1
-var exp : int = 0
 var status = ""
 var lustful : bool = false
 var is_mouse_inside : bool = false
@@ -67,20 +64,6 @@ func _ready() -> void:
 	state_machine.change(&"normal")
 	state_machine._process_pending()
 
-func _get_xp_for_next_level() -> int:
-	return level * 100
-
-func add_experience(amount: int) -> void:
-	exp += amount
-	while exp >= _get_xp_for_next_level():
-		exp -= _get_xp_for_next_level()
-		level_up()
-	emit_signal("xp_changed", exp, level)
-
-func level_up() -> void:
-	level += 1
-	emit_signal("level_upped")
-
 func _physics_process(_delta: float) -> void:
 	if not game_started: return
 	var is_pressing_mouse = Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT)
@@ -97,23 +80,23 @@ func _physics_process(_delta: float) -> void:
 	check_starvation()
 
 	print("player level: ", level)
-	print("life force count: ", life_force - AURA_SIZE)
+	print("life force count: ", lifeforce - AURA_SIZE)
 	if is_starving:
 		status_ind.text = "HuNgRy"
 	else:
 		status_ind.text = "healty"
 
 func check_starvation() -> void:
-	if life_force <= STARVATION_THRESHOLD and not is_starving:
+	if lifeforce <= STARVATION_THRESHOLD and not is_starving:
 		is_starving = true
 		starve_timer.start()
-	if life_force > STARVATION_THRESHOLD and is_starving:
+	if lifeforce > STARVATION_THRESHOLD and is_starving:
 		is_starving = false
 		starve_timer.stop()
 
 func _on_starve_timer_tick() -> void:
-	life_force -= (life_force + AURA_SIZE) * 0.1
-	if life_force <= -AURA_SIZE:
+	lifeforce -= (lifeforce + AURA_SIZE) * 0.1
+	if lifeforce <= -AURA_SIZE:
 		starve_timer.stop()
 		player_dead.emit()
 		state_machine.change(&"dead")

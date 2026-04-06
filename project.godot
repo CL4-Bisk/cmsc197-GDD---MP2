@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Machine Problem 2"
-run/main_scene="uid://dsb4pf56aymxp"
+run/main_scene="uid://cnhhuinpwfj71"
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://icon.svg"
 

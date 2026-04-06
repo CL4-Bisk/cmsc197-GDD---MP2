@@ -10,7 +10,6 @@ radius = 201.6358
 radius = 105.801704
 
 [node name="NPC" unique_id=1043865114 instance=ExtResource("1_3teka")]
-life_force = 25.0
 npc_level = 2
 
 [node name="Sprite2D" parent="." index="2" unique_id=1625813020]
@@ -21,3 +20,5 @@ shape = SubResource("CircleShape2D_nyn1p")
 
 [node name="Zone" parent="Comfort" parent_id_path=PackedInt32Array(1285488212) index="0" unique_id=7612251]
 shape = SubResource("CircleShape2D_3teka")
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="." index="13" unique_id=211840210]

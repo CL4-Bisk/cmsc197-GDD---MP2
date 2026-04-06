@@ -77,6 +77,7 @@ class Feeding extends GameState:
 			t.tween_property(handler, "global_position", feeding_target.global_position, 0.1)
 		
 			feeding_target.state_machine.change(&"struggle")
+			feeding_target.play_scream_sound()
 			
 		return ""
 	
