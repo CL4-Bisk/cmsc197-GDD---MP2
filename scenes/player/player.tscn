@@ -176,6 +176,7 @@ vframes = 7
 libraries/ = SubResource("AnimationLibrary_p47bc")
 
 [node name="Nav2D" type="NavigationObstacle2D" parent="." unique_id=1563589754]
+visible = false
 radius = 5.0
 affect_navigation_mesh = true
 carve_navigation_mesh = true
@@ -183,6 +184,9 @@ carve_navigation_mesh = true
 [node name="DemonTimer" type="Timer" parent="." unique_id=1676745639]
 wait_time = 10.0
 one_shot = true
+
+[node name="StarveTimer" type="Timer" parent="." unique_id=1894557622]
+wait_time = 0.1
 
 [node name="HitBox" type="CollisionShape2D" parent="." unique_id=906811026]
 z_index = 2
@@ -238,8 +242,12 @@ offset_bottom = 16.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[connection signal="player_dead" from="." to="." method="_on_player_dead"]
+[node name="Status" type="Label" parent="." unique_id=1845138907]
+offset_right = 40.0
+offset_bottom = 23.0
+
 [connection signal="level_upped" from="." to="HUD" method="play_level_up"]
+[connection signal="player_dead" from="." to="." method="_on_player_dead"]
 [connection signal="xp_changed" from="." to="HUD" method="update_player_ui"]
 [connection signal="timeout" from="DemonTimer" to="." method="end_demon_time"]
 [connection signal="body_entered" from="Charm" to="." method="_on_charm" binds= [true]]
