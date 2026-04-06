@@ -5,12 +5,15 @@ signal player_dead
 signal feeding_start
 signal feeding_stop
 
+var game_started : bool = false
+
 const AURA_SIZE : int = 40.0
 @onready var state_machine: StateMachine = $StateMachine
 @onready var charm_zone: CollisionShape2D = $Charm/Zone
 @onready var feed_zone: Area2D = $Feed
 @onready var check: RayCast2D = $Check
 @onready var demon_timer: Timer = $DemonTimer
+@onready var invul_timer: Timer = $IFrameTimer
 @onready var censor: ColorRect = $Censor
 @onready var charm_aura: CPUParticles2D = $CharmAura
 
@@ -53,6 +56,7 @@ func _ready() -> void:
 	state_machine._process_pending()
 
 func _physics_process(_delta: float) -> void:
+	if not game_started: return
 	var is_pressing_mouse = Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT)
 	#print(state_machine.stack.map(func(x): return x.state_name))
 	match state_machine.current().state_name:

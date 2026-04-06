@@ -152,7 +152,6 @@ class Subjugated extends GameState:
 
 class Hit extends GameState:
 	var handler : Player
-	
 	func _init() -> void: state_name = &"hit"
 	
 	func begin() -> String:
