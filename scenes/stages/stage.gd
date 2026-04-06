@@ -7,7 +7,7 @@ class_name Stage
 
 @export var npc_scene : PackedScene
 @export var max_npcs: int = 10
-@export var spawn_interval: float = 1.0 # Seconds between spawns
+@export var spawn_interval: float = 2.0 # Seconds between spawns
 
 var current_npc_count: int = 0
 var spawn_timer: Timer

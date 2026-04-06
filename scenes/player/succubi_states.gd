@@ -58,6 +58,14 @@ class Feeding extends GameState:
 		handler.nav2d.avoidance_enabled = false
 		
 		var x = handler.find_nearest()
+		
+		if not x:
+			return &"pop"
+		
+		if handler.get_player_level() < x.get_npc_level():
+			print("player level not high")
+			return &"pop"
+		
 		if x:
 			feeding_target = x
 			
@@ -67,6 +75,8 @@ class Feeding extends GameState:
 			t.tween_property(handler, "global_position", feeding_target.global_position, 0.1)
 		
 			feeding_target.state_machine.change(&"struggle")
+			
+			handler.life_force_count += 1.5 * feeding_target.life_force
 		return ""
 	
 	func begin() -> String:
@@ -74,6 +84,9 @@ class Feeding extends GameState:
 		return &"repeat"
 		
 	func update(delta: float) -> String:
+		
+		if not is_instance_valid(feeding_target):
+			return &"pop"
 		
 		var suck_power = feeding_target.drain_rate * delta \
 							* (2 if handler.lustful else 1)

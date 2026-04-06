@@ -58,6 +58,17 @@ func _ready() -> void:
 	state_machine.register_state(&"enter", NPCStates.Enter)
 	state_machine.register_state(&"exit", NPCStates.Exit)
 
+func get_npc_level() -> int:
+	if life_force <= 5:
+		return 1
+	if life_force <= 25:
+		return 2
+	if life_force <= 50:
+		return 3
+	if life_force <= 120:
+		return 4
+	return 5
+
 func start_state(state_name: StringName = &"") -> void:
 	state_machine.change(&"idle")
 	if state_name != &"":
@@ -150,8 +161,13 @@ func pick_destination(
 
 func update_indicators() -> void:
 	$VigilanceInd.text = str(ceili(vigilance))
-	$LifeForceInd.text = str(ceili(life_force))
+	#$LifeForceInd.text = str(ceili(life_force))
+	$LifeForceInd.text = "Lvl %d: %d" % [get_npc_level(), ceili(life_force)]
 	if state_machine.current(): $StateInd.text = state_machine.current().state_name
+	if stage.player.get_player_level() < get_npc_level():
+		$LifeForceInd.modulate = Color.RED
+	else:
+		$LifeForceInd.modulate = Color.GREEN
 
 func modify_vigilance(amount: float) -> void:
 	vigilance = max(0, vigilance + amount)

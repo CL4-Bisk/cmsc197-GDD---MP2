@@ -18,11 +18,20 @@ class_name Player
 
 @export var life_force : float = 40.0
 @export var total_life_force : float = 40.0
+@export var life_force_count: float = 0.0
 
 var status = ""
 var lustful : bool = false
 var is_mouse_inside : bool = false
 var spd_mult : float = 1.0
+
+var thresholds = {
+	1: 0,
+	2: 30,
+	3: 150,
+	4: 500,
+	5: 1000
+}
 
 func _ready() -> void:
 	state_machine.handler = self
@@ -35,6 +44,13 @@ func _ready() -> void:
 	state_machine.change(&"normal")
 	state_machine._process_pending()
 
+func get_player_level() -> int:
+	var lvl: int = 1
+	for t in thresholds.keys():
+		if life_force_count >= thresholds[t]: 
+			lvl = t
+	return lvl
+
 func _physics_process(_delta: float) -> void:
 	var is_pressing_mouse = Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT)
 	#print(state_machine.stack.map(func(x): return x.state_name))
@@ -46,6 +62,8 @@ func _physics_process(_delta: float) -> void:
 			move_to_mouse(is_pressing_mouse)
 	(charm_zone.shape as CircleShape2D).radius = life_force
 	move_and_slide()
+	print("player level: ", get_player_level())
+	print("life force count: ", life_force_count)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed(&"feed") and \
@@ -91,7 +109,7 @@ func find_nearest() -> Node2D:
 	var min_dis = INF
 	
 	for body in bodies:
-		if not body.is_in_group(&"npc") and body == self: continue
+		if not body.is_in_group(&"npc") and body == self and self.life_force > 0: continue
 		
 		var distance = global_position.distance_to(body.global_position)
 		if distance < min_dis:
