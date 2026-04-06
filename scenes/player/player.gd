@@ -59,6 +59,9 @@ func _physics_process(_delta: float) -> void:
 			move_to_mouse(is_pressing_mouse)
 	(charm_zone.shape as CircleShape2D).radius = life_force
 	move_and_slide()
+	
+	print("player level: ", level)
+	print("life force count: ", life_force - AURA_SIZE)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed(&"feed") and \
@@ -104,7 +107,7 @@ func find_nearest() -> Node2D:
 	var min_dis = INF
 	
 	for body in bodies:
-		if not body.is_in_group(&"npc") and body == self: continue
+		if not body.is_in_group(&"npc") and body == self and self.life_force > 0: continue
 		
 		var distance = global_position.distance_to(body.global_position)
 		if distance < min_dis:

@@ -10,6 +10,8 @@ radius = 201.6358
 radius = 105.801704
 
 [node name="NPC" unique_id=1043865114 instance=ExtResource("1_3teka")]
+life_force = 25.0
+npc_level = 2
 
 [node name="Sprite2D" parent="." index="2" unique_id=1625813020]
 texture = ExtResource("2_nyn1p")

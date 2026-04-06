@@ -21,6 +21,7 @@ class_name NPC
 @export_category("NPC Parameters")
 @export var move_speed : float = 50.0
 @export var life_force : float = 5.0
+@export var npc_level : int = 1
 @export var wait_time : float = 4.0
 @export var exit_chance : float = 0.1
 @export var behavior : Behavior = Behavior.SOBER
@@ -155,8 +156,11 @@ func pick_destination(
 
 func update_indicators() -> void:
 	$VigilanceInd.text = str(ceili(vigilance))
-	$LifeForceInd.text = str(ceili(life_force))
+	$LifeForceInd.text = "Lvl %d: %d" % [npc_level, ceili(life_force)]
 	if state_machine.current(): $StateInd.text = state_machine.current().state_name
+	
+	if stage.player.level < npc_level: $LifeForceInd.modulate = Color.RED
+	else: $LifeForceInd.modulate = Color.GREEN
 
 func modify_vigilance(amount: float) -> void:
 	vigilance = max(0, vigilance + amount)
