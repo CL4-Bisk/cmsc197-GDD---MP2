@@ -42,7 +42,7 @@ const STARVATION_THRESHOLD: float = 0.0
 @export var level_threshold : Dictionary[int, float]
 @export var popup_text : PackedScene
 
-var level : int = 1
+var level : int = 3
 var status = ""
 var lustful : bool = false
 var is_mouse_inside : bool = false

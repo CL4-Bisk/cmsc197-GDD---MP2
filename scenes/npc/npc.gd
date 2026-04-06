@@ -76,7 +76,6 @@ func _init() -> void:
 	vigilance = randf_range(ran.x, ran.y)
 
 func _ready() -> void:
-	nav2d.hide()
 	modify_vigilance(0)
 	state_machine.handler = self
 	state_machine.register_state(&"idle", NPCStates.Idle)
@@ -112,7 +111,7 @@ func play_scream_sound() -> void:
 		print("ERROR: Stream not found in dictionary for ID: ", x)
 
 func _process(_delta):
-	if lifeforce <= 0 and audio.playing:
+	if (lifeforce <= 0 and audio.playing) or Input.is_action_just_pressed("feed"):
 		audio.stop() # Stops the loop immediately when they die
 
 func _physics_process(_delta: float) -> void:
