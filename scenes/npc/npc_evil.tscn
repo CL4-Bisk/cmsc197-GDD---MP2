@@ -1,6 +1,6 @@
-[gd_scene format=3 uid="uid://d164yoqtgbnhe"]
+[gd_scene format=3 uid="uid://bxccphqkicuvb"]
 
-[ext_resource type="Script" uid="uid://bmabmqgg608ef" path="res://scenes/npc/npc_evil.gd" id="1_xgpob"]
+[ext_resource type="Script" path="res://scenes/npc/npc_evil.gd" id="1_xgpob"]
 [ext_resource type="Script" uid="uid://d0injnhv64s4a" path="res://scripts/state_machine.gd" id="2_8oitj"]
 [ext_resource type="Texture2D" uid="uid://b4oysohluqu7v" path="res://assets/npc_hostile.png" id="3_xgpob"]
 

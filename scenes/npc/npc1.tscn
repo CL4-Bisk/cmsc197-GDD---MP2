@@ -20,5 +20,3 @@ shape = SubResource("CircleShape2D_nyn1p")
 
 [node name="Zone" parent="Comfort" parent_id_path=PackedInt32Array(1285488212) index="0" unique_id=7612251]
 shape = SubResource("CircleShape2D_3teka")
-
-[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="." index="13" unique_id=211840210]

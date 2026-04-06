@@ -5,7 +5,7 @@
 [ext_resource type="Script" uid="uid://dd5dga64x7gje" path="res://scripts/camera.gd" id="3_0ia8g"]
 [ext_resource type="PackedScene" uid="uid://dfvk8rhb80jjr" path="res://scenes/npc/npc1.tscn" id="3_4q72m"]
 [ext_resource type="Texture2D" uid="uid://djac2vtbkbyn6" path="res://assets/map/spr_tile_itch.png" id="3_w2nqg"]
-[ext_resource type="PackedScene" path="res://scenes/npc/npc_evil.tscn" id="4_4q72m"]
+[ext_resource type="PackedScene" uid="uid://bxccphqkicuvb" path="res://scenes/npc/npc_evil.tscn" id="4_4q72m"]
 [ext_resource type="Texture2D" uid="uid://c7mqyr44oqi6b" path="res://assets/map/purplecity.png" id="4_872lu"]
 [ext_resource type="PackedScene" uid="uid://bu5owrr0x0q4d" path="res://scenes/npc/npc2.tscn" id="4_lmmxf"]
 [ext_resource type="PackedScene" uid="uid://cyxatyrapq250" path="res://scenes/player/player.tscn" id="4_x8uq7"]
@@ -4753,7 +4753,8 @@ npc_scenes = Dictionary[int, PackedScene]({
 0: ExtResource("2_lmmxf"),
 1: ExtResource("3_4q72m"),
 2: ExtResource("4_lmmxf"),
-3: ExtResource("4_4q72m")
+3: ExtResource("4_4q72m"),
+4: ExtResource("4_4q72m")
 })
 
 [node name="Floor" type="TileMapLayer" parent="." unique_id=702596998]

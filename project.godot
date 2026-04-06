@@ -10,10 +10,10 @@ config_version=5
 
 [application]
 
-config/name="Machine Problem 2"
+config/name="Lustbound"
 run/main_scene="uid://cnhhuinpwfj71"
 config/features=PackedStringArray("4.6", "Forward Plus")
-config/icon="res://icon.svg"
+config/icon="uid://cn02eym2kf7ep"
 
 [display]
 

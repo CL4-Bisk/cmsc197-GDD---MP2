@@ -38,11 +38,11 @@ const STARVATION_THRESHOLD: float = 0.0
 @export var charm_zone_growth_spd : float = 50.0
 
 @export var lifeforce : float = 40.0
-@export var lives : int = 3
+@export var lives : int = 5
 @export var level_threshold : Dictionary[int, float]
 @export var popup_text : PackedScene
 
-var level : int = 3
+var level : int = 5
 var status = ""
 var lustful : bool = false
 var is_mouse_inside : bool = false
@@ -83,6 +83,8 @@ func _physics_process(_delta: float) -> void:
 	print("life force count: ", lifeforce - AURA_SIZE)
 	if is_starving:
 		status_ind.text = "HuNgRy"
+	elif lives < 3:
+		status_ind.text = "HoRt"
 	else:
 		status_ind.text = "healty"
 

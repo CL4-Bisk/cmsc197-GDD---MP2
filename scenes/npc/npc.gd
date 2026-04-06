@@ -17,7 +17,7 @@ class_name NPC
 @onready var sight: Area2D = $Sight
 @onready var sighting: CollisionPolygon2D = $Sight/Sighting
 @onready var check: RayCast2D = $Check
-@onready var audio: AudioStreamPlayer = $AudioStreamPlayer
+@onready var audio: AudioStreamPlayer = $ScreamPlayer
 
 @export_category("NPC Parameters")
 @export var move_speed : float = 50.0
@@ -111,8 +111,13 @@ func play_scream_sound() -> void:
 		print("ERROR: Stream not found in dictionary for ID: ", x)
 
 func _process(_delta):
-	if (lifeforce <= 0 and audio.playing) or Input.is_action_just_pressed("feed"):
-		audio.stop() # Stops the loop immediately when they die
+	# Add 'audio != null' to prevent the crash
+	if audio != null and audio.playing:
+		if lifeforce <= 0 or Input.is_action_just_pressed("feed"):
+			audio.stop()
+	elif audio == null:
+		push_error("ScreamPlayer node is missing on: " + name)
+
 
 func _physics_process(_delta: float) -> void:
 	#print(state_machine.stack.map(func(x): return x.state_name))

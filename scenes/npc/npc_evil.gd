@@ -35,3 +35,28 @@ func _on_sensitive_body_entered(body: Node2D) -> void:
 	if body is Player:
 		if behavior != Behavior.CHARMED:
 			state_machine.change(&"attack")
+
+func play_scream_sound() -> void:
+	var x = randi_range(0, 2)
+	var stream_to_play = audio_scenes.get(x)
+	
+	print("Trying to play sound ID: ", x)
+	
+	if audio == null:
+		print("ERROR: AudioStreamPlayer node not found!")
+		return
+		
+	if stream_to_play:
+		audio.stream = stream_to_play
+		audio.play()
+		print("Audio node 'playing' status: ", audio.playing)
+	else:
+		print("ERROR: Stream not found in dictionary for ID: ", x)
+
+func _process(_delta):
+	# Add 'audio != null' to prevent the crash
+	if audio != null and audio.playing:
+		if lifeforce <= 0 or Input.is_action_just_pressed("feed"):
+			audio.stop()
+	elif audio == null:
+		push_error("ScreamPlayer node is missing on: " + name)
