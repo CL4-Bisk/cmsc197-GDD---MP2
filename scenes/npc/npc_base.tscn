@@ -100,8 +100,22 @@ _data = {
 radius = 7.0
 height = 22.0
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bianu"]
+bg_color = Color(0.80076253, 0.22764963, 0.2686681, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
 [sub_resource type="LabelSettings" id="LabelSettings_0lqhn"]
-font_size = 8
+font_size = 7
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fu1xr"]
+bg_color = Color(0.84705883, 0.7058824, 0.28235295, 1)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_paujj"]
 radius = 158.71709
@@ -149,53 +163,58 @@ debug_enabled = true
 [node name="TickRate" type="Timer" parent="." unique_id=2101497838]
 wait_time = 0.5
 
-[node name="VigilanceInd" type="Label" parent="." unique_id=605134390]
-z_index = 1
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = -20.0
-offset_top = -34.5
-offset_right = 20.0
+[node name="Lifeforce" type="ProgressBar" parent="." unique_id=308170269]
+z_index = 11
+custom_minimum_size = Vector2(32, 9)
+offset_left = -16.0
+offset_top = -20.0
+offset_right = 16.0
+offset_bottom = -11.0
 grow_horizontal = 2
-grow_vertical = 0
-text = "100"
-label_settings = SubResource("LabelSettings_0lqhn")
-horizontal_alignment = 1
+size_flags_horizontal = 3
+size_flags_vertical = 1
+theme_override_styles/fill = SubResource("StyleBoxFlat_bianu")
+value = 50.0
+show_percentage = false
 
-[node name="LifeForceInd" type="Label" parent="." unique_id=82729423]
+[node name="Value" type="Label" parent="Lifeforce" unique_id=82729423]
 z_index = 1
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = -20.0
-offset_top = -23.0
-offset_right = 20.0
-grow_horizontal = 2
-grow_vertical = 0
-text = "100"
+custom_minimum_size = Vector2(20, 0)
+layout_mode = 0
+offset_left = 8.0
+offset_top = -2.0
+offset_right = 28.0
+offset_bottom = 11.0
+text = "1"
 label_settings = SubResource("LabelSettings_0lqhn")
-horizontal_alignment = 1
+horizontal_alignment = 2
+vertical_alignment = 1
 
-[node name="StateInd" type="Label" parent="." unique_id=1687894341]
+[node name="Vigilance" type="ProgressBar" parent="." unique_id=1550901114]
+z_index = 11
+custom_minimum_size = Vector2(32, 4)
+offset_left = -16.0
+offset_top = -25.0
+offset_right = 16.0
+offset_bottom = -21.0
+size_flags_horizontal = 3
+size_flags_vertical = 1
+theme_override_styles/fill = SubResource("StyleBoxFlat_fu1xr")
+value = 50.0
+show_percentage = false
+
+[node name="Value" type="Label" parent="Vigilance" unique_id=2137787758]
 z_index = 1
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = -57.333336
-offset_top = -44.666668
-offset_right = 57.333336
-grow_horizontal = 2
-grow_vertical = 0
-text = "Current"
+custom_minimum_size = Vector2(20, 0)
+layout_mode = 0
+offset_left = 6.0
+offset_top = -6.0
+offset_right = 26.0
+offset_bottom = 5.0
+text = "1"
 label_settings = SubResource("LabelSettings_0lqhn")
 horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="Detection" type="Area2D" parent="." unique_id=1398069970 groups=["npc"]]
 show_behind_parent = true

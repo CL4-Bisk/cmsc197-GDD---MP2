@@ -25,12 +25,13 @@ class Charming extends GameState:
 	
 	func begin() -> String:
 		handler.charm_zone.set_deferred("disabled", false)
-		
+		handler.charm_aura.emitting = true
 		var s = (handler.charm_zone.shape as CircleShape2D)
-		var duration = handler.life_force / handler.charm_zone_growth_spd
+		var duration = handler.lifeforce / handler.charm_zone_growth_spd
 		s.radius = 0.0
-		t = handler.get_tree().create_tween()
-		t.tween_property(s, "radius", handler.life_force, duration).set_trans(Tween.TRANS_LINEAR)
+		t = handler.get_tree().create_tween().set_parallel()
+		t.tween_property(handler.charm_aura, "lifetime", duration, duration)
+		t.tween_property(s, "radius", handler.lifeforce, duration).set_trans(Tween.TRANS_LINEAR)
 		return ""
 	
 	func update(_delta: float) -> String:
@@ -40,9 +41,10 @@ class Charming extends GameState:
 	
 	func end() -> String:
 		if handler.state_machine.stack.is_empty(): handler.state_machine.change(&"normal")
+		handler.charm_aura.emitting = false
 		handler.charm_zone.set_deferred("disabled", true)
 		if t and t.is_running(): t.kill()
-		(handler.charm_zone.shape as CircleShape2D).radius = handler.life_force
+		(handler.charm_zone.shape as CircleShape2D).radius = handler.lifeforce
 		return ""
 
 class Feeding extends GameState:
@@ -54,6 +56,7 @@ class Feeding extends GameState:
 		state_name = &"feed"
 	
 	func start() -> String:
+		handler.feeding_start.emit()
 		handler.censor.show()
 		handler.spd_mult = 0
 		handler.hit_box.set_deferred(&"disabled", true)
@@ -61,8 +64,8 @@ class Feeding extends GameState:
 		
 		var x = handler.find_nearest()
 		
-		if not x or handler.level < x.npc_level():
-			print("player level not high")
+		if not x or handler.level < x.npc_level:
+			handler.generate_text("You need more experience!")
 			handler.state_machine.back()
 			return &"repeat"
 		
@@ -89,13 +92,13 @@ class Feeding extends GameState:
 		var suck_power = feeding_target.drain_rate * delta \
 							* (2 if handler.lustful else 1)
 		
-		feeding_target.life_force -= suck_power
-		handler.life_force += suck_power
+		feeding_target.lifeforce -= suck_power
+		handler.lifeforce += suck_power
 		
 		if Input.is_action_just_pressed(&"feed"): 
 			feeding_target.state_machine.back()
 			return &"pop"
-		if feeding_target.life_force <= 0: 
+		if feeding_target.lifeforce <= 0: 
 			handler.state_machine.back()
 			handler.state_machine.change(&"lust")
 			return ""
@@ -104,10 +107,10 @@ class Feeding extends GameState:
 		return ""
 	
 	func finish() -> void:
+		handler.feeding_stop.emit()
 		for i in handler.level_threshold.keys().slice(handler.level-1, -1):
-			print(handler.level)
-			if handler.level_threshold.get(i) <= handler.life_force - handler.AURA_SIZE: 
-				handler.level = i + 1
+			if handler.level_threshold.get(i) > handler.lifeforce - handler.AURA_SIZE: break 
+			handler.level = i + 1
 		
 		handler.censor.hide()
 		if handler.state_machine.stack.is_empty(): handler.state_machine.change(&"normal")

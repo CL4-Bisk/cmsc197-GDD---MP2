@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://cyxatyrapq250"]
 
 [ext_resource type="Script" uid="uid://rwu1opexsj8d" path="res://scenes/player/player.gd" id="1_cqiqx"]
+[ext_resource type="PackedScene" uid="uid://ullhdpquvp0e" path="res://scenes/popup.tscn" id="2_p47bc"]
 [ext_resource type="Script" uid="uid://d0injnhv64s4a" path="res://scripts/state_machine.gd" id="2_vmepk"]
 [ext_resource type="Texture2D" uid="uid://joie7qrccm4b" path="res://assets/succubus/succubus_player.png" id="3_gmlin"]
 [ext_resource type="Shader" uid="uid://c6ta0bvb2af07" path="res://scenes/player/censor.gdshader" id="4_lvxji"]
@@ -147,6 +148,13 @@ radius = 32.0
 shader = ExtResource("4_lvxji")
 shader_parameter/pixel_size = 70.0000032775
 
+[sub_resource type="Curve" id="Curve_p47bc"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="Gradient" id="Gradient_p47bc"]
+colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 1)
+
 [node name="Player" type="CharacterBody2D" unique_id=1043865114]
 z_index = -1
 collision_mask = 14
@@ -159,6 +167,7 @@ level_threshold = Dictionary[int, float]({
 3: 500.0,
 4: 1000.0
 })
+popup_text = ExtResource("2_p47bc")
 metadata/_edit_group_ = true
 
 [node name="StateMachine" type="Node" parent="." unique_id=520582749]
@@ -234,6 +243,24 @@ offset_right = 16.0
 offset_bottom = 16.0
 grow_horizontal = 2
 grow_vertical = 2
+
+[node name="CharmAura" type="CPUParticles2D" parent="." unique_id=2017985521]
+z_index = -1
+emitting = false
+amount = 60
+speed_scale = 0.4
+explosiveness = 0.1
+randomness = 0.5
+spread = 180.0
+gravity = Vector2(0, -1)
+initial_velocity_min = 60.0
+initial_velocity_max = 60.0
+scale_amount_max = 10.0
+scale_amount_curve = SubResource("Curve_p47bc")
+color = Color(1, 0.2509804, 0.33333334, 1)
+color_ramp = SubResource("Gradient_p47bc")
+hue_variation_min = -1.0
+hue_variation_max = 1.0
 
 [connection signal="timeout" from="DemonTimer" to="." method="end_demon_time"]
 [connection signal="body_entered" from="Charm" to="." method="_on_charm" binds= [true]]

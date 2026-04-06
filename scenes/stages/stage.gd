@@ -2,8 +2,10 @@ extends Node
 class_name Stage
 
 @onready var player: Player = $Player
+@onready var ui: UI = $UI
 @onready var access_zones: Area2D = $AccessZones
 @onready var base_map: NavigationRegion2D = $Map/BaseMap
+@onready var cam: Camera = $Camera2D
 
 @export var npc_scenes : Dictionary[int, PackedScene]
 @export var max_npcs: int = 10
@@ -12,6 +14,13 @@ class_name Stage
 var current_npc_count: int = 0
 var spawn_timer: Timer
 
+func _process(delta: float) -> void:
+	var level = player.level
+	ui.level.text = str(level) if level < 5 else "MAX"
+	ui.lifeforce.text = str(snappedf(player.lifeforce - player.AURA_SIZE, 0.1))
+	ui.charm.text = str(snappedf(player.charm_power.get(level), 0.1)) 
+	ui.hint.text = str(player.level_threshold.get(level)) if level < 5 else "N/A"
+	
 func _ready() -> void:
 	# Set up a timer to handle the "gradual" part
 	spawn_timer = Timer.new()
@@ -36,7 +45,7 @@ func pick_access_point() -> Vector2:
 		randf_range(pos.y - dim.y, pos.y + dim.y))
 
 func spawn_npc() -> void:
-	var x = randi_range(0, player.level-1)
+	var x = randi_range(0, player.level)
 	var n = npc_scenes.get(x).instantiate()
 	n.tree_exited.connect(func(): current_npc_count -= 1; spawn_timer.start())
 	n.global_position = pick_access_point()
@@ -45,3 +54,12 @@ func spawn_npc() -> void:
 	n.stage = self
 	n.nav2d.target_position = NavigationServer2D.region_get_random_point(base_map.get_rid(), 1, true)
 	n.start_state(&"enter")
+
+func _on_player_feeding_start() -> void:
+	cam.zoom = Vector2(4, 4)
+	cam.zoom_distance = 0
+
+func _on_player_feeding_stop() -> void:
+	cam.zoom = Vector2(2, 2)
+	cam.zoom_distance = cam.max_distance
+	

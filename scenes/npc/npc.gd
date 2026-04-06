@@ -20,7 +20,7 @@ class_name NPC
 
 @export_category("NPC Parameters")
 @export var move_speed : float = 50.0
-@export var life_force : float = 5.0
+@export var max_lifeforce : float = 5.0
 @export var npc_level : int = 1
 @export var wait_time : float = 4.0
 @export var exit_chance : float = 0.1
@@ -57,6 +57,7 @@ var _charm_rate : float = 0.0
 var vigilance : float = 0.0
 var spd_mult : float = 1.0
 var drain_rate : float = 0.0
+var lifeforce : float
 var stage : Stage
 var offender : Node2D
 var target : Node2D
@@ -64,6 +65,7 @@ var target : Node2D
 func _init() -> void:
 	# randomly set a vigilance value based on starting behavior
 	var ran = behavior_range.get(behavior)
+	lifeforce = max_lifeforce
 	vigilance = randf_range(ran.x, ran.y)
 
 func _ready() -> void:
@@ -155,16 +157,19 @@ func pick_destination(
 			max_distance, min_distance, target_pos, flee)
 
 func update_indicators() -> void:
-	$VigilanceInd.text = str(ceili(vigilance))
-	$LifeForceInd.text = "Lvl %d: %d" % [npc_level, ceili(life_force)]
-	if state_machine.current(): $StateInd.text = state_machine.current().state_name
+	$Lifeforce.value = lifeforce
+	$Lifeforce.max_value = max_lifeforce
+	$Lifeforce/Value.text = str(snappedf(lifeforce, 0.1))
+	$Vigilance.value = vigilance
+	$Vigilance.max_value = 100
+	$Vigilance/Value.text = str(ceili(vigilance))
 	
-	if stage.player.level < npc_level: $LifeForceInd.modulate = Color.RED
-	else: $LifeForceInd.modulate = Color.GREEN
+	#if stage.player.level < npc_level: $LifeForceInd.modulate = Color.RED
+	#else: $LifeForceInd.modulate = Color.GREEN
 
 func modify_vigilance(amount: float) -> void:
-	vigilance = max(0, vigilance + amount)
-	if life_force == 0: 
+	vigilance = clamp(vigilance + amount, 0, 100)
+	if lifeforce == 0: 
 		behavior = Behavior.DRAINED
 		return
 		

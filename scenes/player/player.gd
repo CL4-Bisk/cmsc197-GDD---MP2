@@ -2,6 +2,8 @@ extends CharacterBody2D
 class_name Player
 
 signal player_dead
+signal feeding_start
+signal feeding_stop
 
 const AURA_SIZE : int = 40.0
 @onready var state_machine: StateMachine = $StateMachine
@@ -10,6 +12,7 @@ const AURA_SIZE : int = 40.0
 @onready var check: RayCast2D = $Check
 @onready var demon_timer: Timer = $DemonTimer
 @onready var censor: ColorRect = $Censor
+@onready var charm_aura: CPUParticles2D = $CharmAura
 
 @onready var anim: AnimationPlayer = $AnimationPlayer
 @onready var sprite: Sprite2D = $Sprite2D
@@ -26,9 +29,10 @@ const AURA_SIZE : int = 40.0
 }
 @export var charm_zone_growth_spd : float = 50.0
 
-@export var life_force : float = 40.0
+@export var lifeforce : float = 40.0
 @export var lives : int = 3
 @export var level_threshold : Dictionary[int, float]
+@export var popup_text : PackedScene
 
 var level : int = 1
 var status = ""
@@ -57,17 +61,21 @@ func _physics_process(_delta: float) -> void:
 		_:
 			anim.speed_scale = spd_mult
 			move_to_mouse(is_pressing_mouse)
-	(charm_zone.shape as CircleShape2D).radius = life_force
+	(charm_zone.shape as CircleShape2D).radius = lifeforce
 	move_and_slide()
-	
-	print("player level: ", level)
-	print("life force count: ", life_force - AURA_SIZE)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed(&"feed") and \
 	state_machine.current().state_name != &"feed" and \
 	feed_zone.has_overlapping_bodies():
 		state_machine.change(&"feed")
+
+func generate_text(text: String) -> void:
+	var p = popup_text.instantiate()
+	p.text = text
+	add_child(p)
+	await p.finished
+	p.queue_free()
 
 func move_to_mouse(is_pressed : bool) -> void:
 	if state_machine.current() is SucccubiStates.Feeding: return
@@ -107,7 +115,7 @@ func find_nearest() -> Node2D:
 	var min_dis = INF
 	
 	for body in bodies:
-		if not body.is_in_group(&"npc") and body == self and self.life_force > 0: continue
+		if not body.is_in_group(&"npc") and body == self and self.lifeforce > 0: continue
 		
 		var distance = global_position.distance_to(body.global_position)
 		if distance < min_dis:

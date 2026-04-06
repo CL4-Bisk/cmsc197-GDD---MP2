@@ -1,0 +1,67 @@
+[gd_scene format=3 uid="uid://wrcxgcwq3b6f"]
+
+[ext_resource type="Script" uid="uid://cwj5p6gv7yewu" path="res://ui.gd" id="1_nt7q6"]
+
+[node name="UI" type="CanvasLayer" unique_id=1625433607]
+script = ExtResource("1_nt7q6")
+
+[node name="LifeforceGathered" type="Label" parent="." unique_id=1472815065]
+offset_left = 11.0
+offset_top = 10.0
+offset_right = 165.0
+offset_bottom = 33.0
+text = "Lifeforce Gathered: "
+horizontal_alignment = 1
+
+[node name="Value" type="Label" parent="LifeforceGathered" unique_id=776602811]
+layout_mode = 0
+offset_left = 153.0
+offset_right = 193.0
+offset_bottom = 23.0
+text = "00000"
+vertical_alignment = 1
+
+[node name="Level" type="Label" parent="." unique_id=1151252636]
+offset_left = 11.0
+offset_top = 39.0
+offset_right = 165.0
+offset_bottom = 62.0
+text = "Level"
+
+[node name="Value" type="Label" parent="Level" unique_id=358161072]
+layout_mode = 0
+offset_left = 49.0
+offset_right = 89.0
+offset_bottom = 23.0
+text = "00000"
+vertical_alignment = 1
+
+[node name="SuccPower" type="Label" parent="." unique_id=427610421]
+offset_left = 11.0
+offset_top = 68.0
+offset_right = 165.0
+offset_bottom = 91.0
+text = "Succubus Power:"
+
+[node name="Value" type="Label" parent="SuccPower" unique_id=454669002]
+layout_mode = 0
+offset_left = 140.0
+offset_right = 186.0
+offset_bottom = 23.0
+text = "00000"
+vertical_alignment = 1
+
+[node name="Hint" type="Label" parent="." unique_id=618065232]
+offset_left = 11.0
+offset_top = 100.0
+offset_right = 165.0
+offset_bottom = 123.0
+text = "Lifeforce to next level: "
+
+[node name="Value" type="Label" parent="Hint" unique_id=1845554072]
+layout_mode = 0
+offset_left = 180.0
+offset_right = 226.0
+offset_bottom = 23.0
+text = "00000"
+vertical_alignment = 1
