@@ -13,7 +13,6 @@ config_version=5
 config/name="Lustbound"
 run/main_scene="uid://cnhhuinpwfj71"
 config/features=PackedStringArray("4.6", "Forward Plus")
-config/icon="uid://cn02eym2kf7ep"
 
 [display]
 
