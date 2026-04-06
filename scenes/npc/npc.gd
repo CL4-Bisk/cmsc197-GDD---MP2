@@ -89,7 +89,6 @@ func start_state(state_name: StringName = &"") -> void:
 func _physics_process(_delta: float) -> void:
 	#print(state_machine.stack.map(func(x): return x.state_name))
 	update_indicators()
-
 	navigate()
 	move_and_slide()
 	if velocity.length() != 0: sprite.flip_h = velocity.x < 0
