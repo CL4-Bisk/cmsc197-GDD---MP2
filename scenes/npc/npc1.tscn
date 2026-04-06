@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://dfvk8rhb80jjr"]
+
+[ext_resource type="PackedScene" uid="uid://0vtdhdrxcgxi" path="res://scenes/npc/npc_base.tscn" id="1_3teka"]
+[ext_resource type="Texture2D" uid="uid://nasm60ypr4ni" path="res://assets/npc_var2.png" id="2_nyn1p"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_nyn1p"]
+radius = 201.6358
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_3teka"]
+radius = 105.801704
+
+[node name="NPC" unique_id=1043865114 instance=ExtResource("1_3teka")]
+
+[node name="Sprite2D" parent="." index="2" unique_id=1625813020]
+texture = ExtResource("2_nyn1p")
+
+[node name="Zone" parent="Detection" parent_id_path=PackedInt32Array(1398069970) index="0" unique_id=1555590754]
+shape = SubResource("CircleShape2D_nyn1p")
+
+[node name="Zone" parent="Comfort" parent_id_path=PackedInt32Array(1285488212) index="0" unique_id=7612251]
+shape = SubResource("CircleShape2D_3teka")

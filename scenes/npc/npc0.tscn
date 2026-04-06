@@ -1,0 +1,28 @@
+[gd_scene format=3 uid="uid://cvu6g1wo4g2rn"]
+
+[ext_resource type="PackedScene" uid="uid://0vtdhdrxcgxi" path="res://scenes/npc/npc_base.tscn" id="1_2qofa"]
+[ext_resource type="Texture2D" uid="uid://cvo2em0se6ud2" path="res://assets/npc_var3.png" id="2_qwv6d"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_2qofa"]
+radius = 119.26861
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_qwv6d"]
+radius = 70.064255
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_x7gml"]
+radius = 9.0
+height = 26.0
+
+[node name="NPC" unique_id=1043865114 instance=ExtResource("1_2qofa")]
+
+[node name="Sprite2D" parent="." index="2" unique_id=1625813020]
+texture = ExtResource("2_qwv6d")
+
+[node name="Zone" parent="Detection" parent_id_path=PackedInt32Array(1398069970) index="0" unique_id=1555590754]
+shape = SubResource("CircleShape2D_2qofa")
+
+[node name="Zone" parent="Comfort" parent_id_path=PackedInt32Array(1285488212) index="0" unique_id=7612251]
+shape = SubResource("CircleShape2D_qwv6d")
+
+[node name="Zone" parent="Sensitive" parent_id_path=PackedInt32Array(187477538) index="0" unique_id=196461142]
+shape = SubResource("CapsuleShape2D_x7gml")

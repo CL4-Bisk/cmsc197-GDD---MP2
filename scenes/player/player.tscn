@@ -152,6 +152,13 @@ z_index = -1
 collision_mask = 14
 motion_mode = 1
 script = ExtResource("1_cqiqx")
+level_threshold = Dictionary[int, float]({
+0: 0.0,
+1: 30.0,
+2: 150.0,
+3: 500.0,
+4: 1000.0
+})
 metadata/_edit_group_ = true
 
 [node name="StateMachine" type="Node" parent="." unique_id=520582749]

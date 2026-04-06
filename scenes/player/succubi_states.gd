@@ -38,11 +38,12 @@ class Charming extends GameState:
 		if Input.is_action_just_released(&"charm"): return &"pop"
 		return ""
 	
-	func finish() -> void:
+	func end() -> String:
 		if handler.state_machine.stack.is_empty(): handler.state_machine.change(&"normal")
 		handler.charm_zone.set_deferred("disabled", true)
 		if t and t.is_running(): t.kill()
 		(handler.charm_zone.shape as CircleShape2D).radius = handler.life_force
+		return ""
 
 class Feeding extends GameState:
 	var handler : Player
@@ -75,7 +76,6 @@ class Feeding extends GameState:
 		return &"repeat"
 		
 	func update(delta: float) -> String:
-		
 		var suck_power = feeding_target.drain_rate * delta \
 							* (2 if handler.lustful else 1)
 		
@@ -94,6 +94,11 @@ class Feeding extends GameState:
 		return ""
 	
 	func finish() -> void:
+		for i in handler.level_threshold.keys().slice(handler.level-1, -1):
+			print(handler.level)
+			if handler.level_threshold.get(i) <= handler.life_force - handler.AURA_SIZE: 
+				handler.level = i + 1
+		
 		handler.censor.hide()
 		if handler.state_machine.stack.is_empty(): handler.state_machine.change(&"normal")
 		handler.nav2d.avoidance_enabled = true
@@ -127,3 +132,23 @@ class Subjugated extends GameState:
 		handler.spd_mult = 0.0
 		handler.anim.play(&"dead")
 		return ""
+
+class Hit extends GameState:
+	var handler : Player
+	
+	func _init() -> void: state_name = &"hit"
+	
+	func begin() -> String:
+		handler.anim.play(&"hit")
+		handler.anim.animation_finished.connect(
+			func(_x): handler.state_machine.back()
+		)
+		return ""
+	
+	func finish() -> void:
+		handler.lives -= 1
+		if handler.lives <= 0:
+			handler.player_dead.emit()
+			handler.state_machine.change(&"dead")
+			return
+		handler.state_machine.change(&"normal")

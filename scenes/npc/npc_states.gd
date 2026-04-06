@@ -8,11 +8,11 @@ class Idle extends GameState:
 	
 	func threat_detected(body: Node2D) -> void:
 		handler.offender = body
-		handler.state_machine.change(&"flee")
+		handler.state_machine.change(&"threat")
 	
 	func interest_detected(body: Node2D) -> void:
 		handler.target = body
-		handler.state_machine.change(&"chase")
+		handler.state_machine.change(&"follow")
 	
 	func begin() -> String:
 		handler.state_machine.refresh()
@@ -33,7 +33,7 @@ class Idle extends GameState:
 				if handler.target != null:
 					if handler.detection.overlaps_body(handler.target) and \
 					not handler.comfort.overlaps_body(handler.target):
-						handler.state_machine.change(&"chase")
+						handler.state_machine.change(&"follow")
 						return
 		if (randf() < 0.1):
 			handler.state_machine.change(&"exit")
@@ -62,12 +62,12 @@ class Wander extends GameState:
 	func threat_detected(body: Node2D) -> void:
 		handler.state_machine.back()
 		handler.offender = body
-		handler.state_machine.change(&"flee")
+		handler.state_machine.change(&"threat")
 	
 	func interest_detected(body: Node2D) -> void:
 		handler.state_machine.back()
 		handler.target = body
-		handler.state_machine.change(&"chase")
+		handler.state_machine.change(&"follow")
 	
 	func begin() -> String:
 		handler.anim.play(&"run")
@@ -82,7 +82,7 @@ class Wander extends GameState:
 
 class Flee extends GameState:
 	var handler : NPC
-	func _init() -> void: state_name = &"flee"
+	func _init() -> void: state_name = &"threat"
 	
 	func threat_detected(body: Node2D) -> void:
 		handler.offender = body
@@ -120,12 +120,12 @@ class Flee extends GameState:
 
 class Chase extends GameState:
 	var handler : NPC
-	func _init() -> void: state_name = &"chase"
+	func _init() -> void: state_name = &"follow"
 	
 	func threat_detected(body: Node2D) -> void:
 		handler.state_machine.back()
 		handler.offender = body
-		handler.state_machine.change(&"flee")
+		handler.state_machine.change(&"threat")
 	
 	func interest_detected(body: Node2D) -> void:
 		if handler.behavior == NPC.Behavior.CHARMED: return
@@ -167,9 +167,8 @@ class Struggle extends GameState:
 		handler.set_collision_mask_value(1, false)
 		return ""
 	
-	func update(delta: float) -> String:
+	func update(_delta: float) -> String:
 		if handler.nav2d.is_navigation_finished(): handler.nav2d.target_position = _distance()
-		handler.life_force -= handler.drain_rate * delta
 		handler.update_indicators()
 		if handler.life_force <= 0:
 			handler.state_machine.refresh()
@@ -209,12 +208,12 @@ class Enter extends GameState:
 	func threat_detected(body: Node2D) -> void:
 		handler.state_machine.back()
 		handler.offender = body
-		handler.state_machine.change(&"flee")
+		handler.state_machine.change(&"threat")
 	
 	func interest_detected(body: Node2D) -> void:
 		handler.state_machine.back()
 		handler.target = body
-		handler.state_machine.change(&"chase")
+		handler.state_machine.change(&"follow")
 	
 	func start() -> String:
 		handler.set_spd(handler.move_speed)
@@ -239,12 +238,12 @@ class Exit extends GameState:
 	func threat_detected(body: Node2D) -> void:
 		handler.state_machine.back()
 		handler.offender = body
-		handler.state_machine.change(&"flee")
+		handler.state_machine.change(&"threat")
 	
 	func interest_detected(body: Node2D) -> void:
 		handler.state_machine.back()
 		handler.target = body
-		handler.state_machine.change(&"chase")
+		handler.state_machine.change(&"follow")
 	
 	func start() -> String:
 		handler.nav2d.target_position = handler.stage.pick_access_point()

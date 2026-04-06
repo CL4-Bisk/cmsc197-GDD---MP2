@@ -1,6 +1,7 @@
 extends CharacterBody2D
 class_name NPC
 
+# prelim
 @onready var state_machine: StateMachine = $StateMachine
 @onready var anim: AnimationPlayer = $AnimationPlayer
 @onready var sprite: Sprite2D = $Sprite2D
@@ -17,14 +18,12 @@ class_name NPC
 @onready var sighting: CollisionPolygon2D = $Sight/Sighting
 @onready var check: RayCast2D = $Check
 
-@export_category("Dynamic Parameters")
-@export var move_speed : float = 100.0
-@export var life_force : float = 10.0
-var vigilance : float = 0.0
-
-@export_category("Fixed Parameters")
+@export_category("NPC Parameters")
+@export var move_speed : float = 50.0
+@export var life_force : float = 5.0
 @export var wait_time : float = 4.0
-
+@export var exit_chance : float = 0.1
+@export var behavior : Behavior = Behavior.SOBER
 enum Behavior {
 	CHARMED,	# reduction amount is havled
 	DULLED,		# 1/3
@@ -34,26 +33,46 @@ enum Behavior {
 	TERRIFIED,	# 1/20
 	DRAINED, 
 }
-@export var behavior : Behavior = Behavior.SOBER
-@export var mult : Dictionary[Behavior, Vector2] = {
-	Behavior.CHARMED: Vector2(2, 0),
+@export var behavior_range : Dictionary[Behavior, Vector2] = {
+	Behavior.CHARMED: Vector2(-1, 0),
 	Behavior.DULLED: Vector2(1, 15),
-	Behavior.SOBER: Vector2(1.0/2, 50),
-	Behavior.ALERT: Vector2(1.0/5, 75),
-	Behavior.ALARMED: Vector2(1.0/10, 99),
-	Behavior.TERRIFIED: Vector2(1.0/25, 100),
+	Behavior.SOBER: Vector2(15, 40),
+	Behavior.ALERT: Vector2(40, 70),
+	Behavior.ALARMED: Vector2(70, 99),
+	Behavior.TERRIFIED: Vector2(99, 100),
+}
+@export var behavior_drain : Dictionary[Behavior, float] = {
+	Behavior.CHARMED: 2, 
+	Behavior.DULLED: 1,
+	Behavior.SOBER: 1.0/2,
+	Behavior.ALERT: 1.0/5,
+	Behavior.ALARMED: 1.0/10,
+	Behavior.TERRIFIED: 1.0/25,
 }
 
+# dynamic
+var _spd : float
+var _charm_rate : float = 0.0
+var vigilance : float = 0.0
+var spd_mult : float = 1.0
+var drain_rate : float = 0.0
+var stage : Stage
+var offender : Node2D
+var target : Node2D
+
+func _init() -> void:
+	# randomly set a vigilance value based on starting behavior
+	var ran = behavior_range.get(behavior)
+	vigilance = randf_range(ran.x, ran.y)
+
 func _ready() -> void:
-	vigilance = mult.get(behavior).y
 	modify_vigilance(0)
-	
 	state_machine.handler = self
 	state_machine.register_state(&"idle", NPCStates.Idle)
 	state_machine.register_state(&"wander", NPCStates.Wander)
-	state_machine.register_state(&"flee", NPCStates.Flee)
+	state_machine.register_state(&"threat", NPCStates.Flee)
 	state_machine.register_state(&"struggle", NPCStates.Struggle)
-	state_machine.register_state(&"chase", NPCStates.Chase)
+	state_machine.register_state(&"follow", NPCStates.Chase)
 	state_machine.register_state(&"husk", NPCStates.Husk)
 	state_machine.register_state(&"enter", NPCStates.Enter)
 	state_machine.register_state(&"exit", NPCStates.Exit)
@@ -63,18 +82,6 @@ func start_state(state_name: StringName = &"") -> void:
 	if state_name != &"":
 		state_machine.change(state_name)
 	state_machine._process_pending()
-
-var spd_mult : float = 1.0
-var _spd : float
-
-# the rate at which vigilance decreases when in charm zone
-var _charm_rate : float = 0.0
-# the rate at which lifeforce decreases when fed on
-var drain_rate : float = 0.0
-
-var stage : Stage
-var offender : Node2D
-var target : Node2D
 
 func _physics_process(_delta: float) -> void:
 	#print(state_machine.stack.map(func(x): return x.state_name))
@@ -109,8 +116,6 @@ func _on_nav_2d_velocity_computed(safe_velocity: Vector2) -> void:
 	if not sight.has_overlapping_bodies(): return
 	if state_machine.current().state_name != &"idle":
 		velocity = velocity.lerp(safe_velocity, 0.1)
-	
-	
 
 func toggle_zones(enabled: bool, ... zones: Array) -> void:
 	for z in zones:
@@ -159,10 +164,10 @@ func modify_vigilance(amount: float) -> void:
 		behavior = Behavior.DRAINED
 		return
 		
-	for i in mult.keys():
-		var comparison = mult[i].y
-		if vigilance <= comparison:
-			drain_rate = mult[i].x
+	for i in behavior_range:
+		var comparison = behavior_range.get(i)
+		if vigilance > comparison.x and vigilance <= comparison.y:
+			drain_rate = behavior_drain.get(behavior)
 			behavior = i
 			return
 
@@ -176,9 +181,7 @@ func _reduce_vigilance() -> void: modify_vigilance(-_charm_rate)
 
 func _on_detection_body_entered(body: Node2D) -> void:
 	if body == self: return
-	
 	var current_state = state_machine.current()
-	
 	if body is Player:
 		match behavior:
 			Behavior.TERRIFIED: state_machine.change(&"exit")

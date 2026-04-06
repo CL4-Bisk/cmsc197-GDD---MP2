@@ -1,6 +1,9 @@
 extends CharacterBody2D
 class_name Player
 
+signal player_dead
+
+const AURA_SIZE : int = 40.0
 @onready var state_machine: StateMachine = $StateMachine
 @onready var charm_zone: CollisionShape2D = $Charm/Zone
 @onready var feed_zone: Area2D = $Feed
@@ -14,12 +17,20 @@ class_name Player
 @onready var hit_box: CollisionShape2D = $HitBox
 
 @export var move_speed : float = 250.0
-@export var charm_power : float = 1.0
+@export var charm_power : Dictionary[int, float] = {
+	1: 1.0,
+	2: 2.5,
+	3: 5.0,
+	4: 8,
+	5: 12
+}
 @export var charm_zone_growth_spd : float = 50.0
 
 @export var life_force : float = 40.0
 @export var lives : int = 3
+@export var level_threshold : Dictionary[int, float]
 
+var level : int = 1
 var status = ""
 var lustful : bool = false
 var is_mouse_inside : bool = false
@@ -32,6 +43,7 @@ func _ready() -> void:
 	state_machine.register_state(&"feed", SucccubiStates.Feeding)
 	state_machine.register_state(&"lust", SucccubiStates.Lustful)
 	state_machine.register_state(&"dead", SucccubiStates.Subjugated)
+	state_machine.register_state(&"hit", SucccubiStates.Hit)
 	
 	state_machine.change(&"normal")
 	state_machine._process_pending()
@@ -39,11 +51,11 @@ func _ready() -> void:
 func _physics_process(_delta: float) -> void:
 	var is_pressing_mouse = Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT)
 	#print(state_machine.stack.map(func(x): return x.state_name))
-
 	match state_machine.current().state_name:
-		&"feed", &"dead":
+		&"feed", &"dead", &"hit":
 			velocity = Vector2.ZERO
 		_:
+			anim.speed_scale = spd_mult
 			move_to_mouse(is_pressing_mouse)
 	(charm_zone.shape as CircleShape2D).radius = life_force
 	move_and_slide()
@@ -107,7 +119,7 @@ func mouse_detect(toggle: bool) -> void:
 func _on_charm(body: Node2D, entered: bool) -> void:
 	if body is NPC:
 		var npc = (body as NPC)
-		npc.receive_charm(charm_power if entered else 0.0)
+		npc.receive_charm(charm_power.get(level) if entered else 0.0)
 
 func end_demon_time() -> void:
 	lustful = false
@@ -116,3 +128,7 @@ func end_demon_time() -> void:
 	if state_machine.current().state_name == &"lust":
 		state_machine.back()
 		state_machine.change(&"normal")
+
+func hit() -> void:
+	if lustful: return
+	state_machine.change(&"hit")

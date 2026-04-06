@@ -5,7 +5,7 @@ class_name Stage
 @onready var access_zones: Area2D = $AccessZones
 @onready var base_map: NavigationRegion2D = $Map/BaseMap
 
-@export var npc_scene : PackedScene
+@export var npc_scenes : Dictionary[int, PackedScene]
 @export var max_npcs: int = 10
 @export var spawn_interval: float = 1.0 # Seconds between spawns
 
@@ -36,7 +36,8 @@ func pick_access_point() -> Vector2:
 		randf_range(pos.y - dim.y, pos.y + dim.y))
 
 func spawn_npc() -> void:
-	var n = npc_scene.instantiate() as NPC
+	var x = randi_range(0, player.level-1)
+	var n = npc_scenes.get(x).instantiate()
 	n.tree_exited.connect(func(): current_npc_count -= 1; spawn_timer.start())
 	n.global_position = pick_access_point()
 	add_child(n)

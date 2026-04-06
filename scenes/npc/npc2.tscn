@@ -1,0 +1,18 @@
+[gd_scene format=3 uid="uid://bu5owrr0x0q4d"]
+
+[ext_resource type="PackedScene" uid="uid://0vtdhdrxcgxi" path="res://scenes/npc/npc_base.tscn" id="1_pg4w5"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_pg4w5"]
+radius = 49.24429
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_bb20w"]
+radius = 23.0
+height = 62.0
+
+[node name="NPC" unique_id=1043865114 instance=ExtResource("1_pg4w5")]
+
+[node name="Zone" parent="Comfort" parent_id_path=PackedInt32Array(1285488212) index="0" unique_id=7612251]
+shape = SubResource("CircleShape2D_pg4w5")
+
+[node name="Zone" parent="Sensitive" parent_id_path=PackedInt32Array(187477538) index="0" unique_id=196461142]
+shape = SubResource("CapsuleShape2D_bb20w")
