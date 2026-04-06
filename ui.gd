@@ -21,7 +21,7 @@ func _ready() -> void:
 	audio.play()
 
 func start_game_pressed() -> void:
-	audio.stream = preload("res://assets/audio/stagemusic.wav")
+	audio.stream = preload("res://assets/audio/dmassaiii-intense-forensics-252782.mp3")
 	audio.play()
 	title_screen.hide()
 	game_info.show()

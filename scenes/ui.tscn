@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://qot015wf8xmu"]
 
 [ext_resource type="Script" uid="uid://cwj5p6gv7yewu" path="res://ui.gd" id="1_nt7q6"]
-[ext_resource type="AudioStream" uid="uid://bcs4qqdtwrgod" path="res://assets/audio/stageintro.wav" id="2_x4jx1"]
+[ext_resource type="AudioStream" uid="uid://c3wbsrwjjcymd" path="res://assets/audio/theboysbeats-the-boy-s-beats-top-gear-2025-283029.mp3" id="2_x4jx1"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_nt7q6"]
 font_size = 80
