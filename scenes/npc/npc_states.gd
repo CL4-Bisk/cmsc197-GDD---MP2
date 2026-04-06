@@ -170,7 +170,7 @@ class Struggle extends GameState:
 	func update(_delta: float) -> String:
 		if handler.nav2d.is_navigation_finished(): handler.nav2d.target_position = _distance()
 		handler.update_indicators()
-		if handler.life_force <= 0:
+		if handler.lifeforce <= 0:
 			handler.state_machine.refresh()
 			return &"husk"
 		return ""
@@ -262,3 +262,82 @@ class Exit extends GameState:
 	func finish() -> void:
 		handler.nav2d.set_navigation_layer_value(1, true)
 		handler.nav2d.set_navigation_layer_value(3, false)
+
+class AggroIdle extends GameState:
+	var handler : NPC
+	var timer : SceneTreeTimer
+	func _init() -> void: state_name = &"idle"
+	
+	func threat_detected(body: Node2D) -> void:
+		handler.offender = body
+		handler.state_machine.change(&"threat")
+	
+	func interest_detected(body: Node2D) -> void:
+		handler.target = body
+		handler.state_machine.change(&"follow")
+	
+	func begin() -> String:
+		handler.state_machine.refresh()
+		handler.sensitive.set_collision_mask_value(3, true)
+		handler.anim.play(&"idle")
+		
+		handler.nav2d.target_position = handler.global_position
+		
+		timer = handler.get_tree().create_timer(
+			handler.wait_time + randf_range(-2, 2)
+		)
+		timer.timeout.connect(_idle_finished)
+		return ""
+	
+	func _idle_finished() -> void:
+		if handler.detection.overlaps_body(handler.stage.player):
+			if handler.behavior <= handler.Behavior.DULLED: 
+				interest_detected(handler.stage.player)
+				return
+		if (randf() < 0.1):
+			handler.state_machine.change(&"exit")
+			return
+		handler.state_machine.change(&"wander")
+	
+	func update(_delta: float) -> String:
+		handler.velocity = Vector2.ZERO
+		return ""
+	
+	func end() -> String:
+		timer.timeout.disconnect(_idle_finished)
+		return ""
+
+class AggroChase extends GameState:
+	var handler : NPC
+	func _init() -> void: state_name = &"threat"
+	
+	func begin() -> String:
+		if handler.sensitive.overlaps_body(handler.stage.player):
+			handler.state_machine.change(&"attack")
+			return &"repeat"
+		
+		handler.anim.play(&"run")
+		return ""
+	
+	func update(_delta: float) -> String:
+		if handler.detection.overlaps_body(handler.stage.player):
+			handler.nav2d.target_position = handler.stage.player.global_position
+			handler.hit.look_at(handler.nav2d.target_position)
+			return ""
+		
+		if handler.nav2d.is_navigation_finished():
+			return &"pop"
+		return ""
+	
+	func finish() -> void:
+		if handler.state_machine.stack.is_empty():
+			handler.change(&"idle")
+
+class Attack extends GameState:
+	var handler : NPC
+	func _init() -> void: state_name = &"attack"
+	func start() -> String:
+		handler.velocity = Vector2.ZERO
+		handler.anim.play(&"hit")
+		handler.anim.animation_finished.connect(func(_x): handler.state_machine.back(), CONNECT_ONE_SHOT)
+		return ""
