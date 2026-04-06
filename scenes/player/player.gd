@@ -6,6 +6,7 @@ class_name Player
 @onready var feed_zone: Area2D = $Feed
 @onready var check: RayCast2D = $Check
 @onready var demon_timer: Timer = $DemonTimer
+@onready var censor: ColorRect = $Censor
 
 @onready var anim: AnimationPlayer = $AnimationPlayer
 @onready var sprite: Sprite2D = $Sprite2D
@@ -17,7 +18,7 @@ class_name Player
 @export var charm_zone_growth_spd : float = 50.0
 
 @export var life_force : float = 40.0
-@export var total_life_force : float = 40.0
+@export var lives : int = 3
 
 var status = ""
 var lustful : bool = false

@@ -27,10 +27,10 @@ class Charming extends GameState:
 		handler.charm_zone.set_deferred("disabled", false)
 		
 		var s = (handler.charm_zone.shape as CircleShape2D)
-		var duration = handler.total_life_force / handler.charm_zone_growth_spd
+		var duration = handler.life_force / handler.charm_zone_growth_spd
 		s.radius = 0.0
 		t = handler.get_tree().create_tween()
-		t.tween_property(s, "radius", handler.total_life_force, duration).set_trans(Tween.TRANS_LINEAR)
+		t.tween_property(s, "radius", handler.life_force, duration).set_trans(Tween.TRANS_LINEAR)
 		return ""
 	
 	func update(_delta: float) -> String:
@@ -42,7 +42,7 @@ class Charming extends GameState:
 		if handler.state_machine.stack.is_empty(): handler.state_machine.change(&"normal")
 		handler.charm_zone.set_deferred("disabled", true)
 		if t and t.is_running(): t.kill()
-		(handler.charm_zone.shape as CircleShape2D).radius = handler.total_life_force
+		(handler.charm_zone.shape as CircleShape2D).radius = handler.life_force
 
 class Feeding extends GameState:
 	var handler : Player
@@ -53,6 +53,7 @@ class Feeding extends GameState:
 		state_name = &"feed"
 	
 	func start() -> String:
+		handler.censor.show()
 		handler.spd_mult = 0
 		handler.hit_box.set_deferred(&"disabled", true)
 		handler.nav2d.avoidance_enabled = false
@@ -79,7 +80,6 @@ class Feeding extends GameState:
 							* (2 if handler.lustful else 1)
 		
 		feeding_target.life_force -= suck_power
-		handler.total_life_force += suck_power
 		handler.life_force += suck_power
 		
 		if Input.is_action_just_pressed(&"feed"): 
@@ -94,6 +94,7 @@ class Feeding extends GameState:
 		return ""
 	
 	func finish() -> void:
+		handler.censor.hide()
 		if handler.state_machine.stack.is_empty(): handler.state_machine.change(&"normal")
 		handler.nav2d.avoidance_enabled = true
 		handler.hit_box.set_deferred("disabled", false)
