@@ -86,8 +86,18 @@ func start_state(state_name: StringName = &"") -> void:
 
 func _physics_process(_delta: float) -> void:
 	#print(state_machine.stack.map(func(x): return x.state_name))
+	if life_force <= 24:
+		npc_level = 1
+	elif life_force <= 49:
+		npc_level = 2
+	elif life_force <= 119:
+		npc_level = 3
+	elif life_force <= 449:
+		npc_level = 4
+	else:
+		npc_level = 5
+		
 	update_indicators()
-
 	navigate()
 	move_and_slide()
 	if velocity.length() != 0: sprite.flip_h = velocity.x < 0

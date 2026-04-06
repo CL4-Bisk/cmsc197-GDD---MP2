@@ -42,6 +42,8 @@ func spawn_npc() -> void:
 	n.global_position = pick_access_point()
 	add_child(n)
 	current_npc_count += 1
+	if player.life_force > n.life_force:
+		n.life_force += player.life_force - player.AURA_SIZE
 	n.stage = self
 	n.nav2d.target_position = NavigationServer2D.region_get_random_point(base_map.get_rid(), 1, true)
 	n.start_state(&"enter")
