@@ -61,7 +61,7 @@ class Feeding extends GameState:
 		
 		var x = handler.find_nearest()
 		
-		if not x or handler.level < x.npc_level():
+		if not x or handler.level < x.npc_level:
 			print("player level not high")
 			handler.state_machine.back()
 			return &"repeat"
