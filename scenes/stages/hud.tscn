@@ -1,0 +1,28 @@
+[gd_scene format=3 uid="uid://dgikx8u826ng7"]
+
+[ext_resource type="Script" uid="uid://d4jbecmt4av5t" path="res://scenes/stages/hud.gd" id="1_r16cf"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_r16cf"]
+bg_color = Color(0.9209347, 0.399658, 0.5397748, 1)
+
+[node name="HUD" type="Control" unique_id=948591641]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_r16cf")
+
+[node name="EXP" type="ProgressBar" parent="." unique_id=1639142541]
+layout_mode = 0
+offset_right = 4.0
+offset_bottom = 27.0
+theme_override_styles/fill = SubResource("StyleBoxFlat_r16cf")
+show_percentage = false
+
+[node name="Level" type="Label" parent="." unique_id=986405310]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+
+[node name="EXPlabel" type="Label" parent="." unique_id=681076842]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0

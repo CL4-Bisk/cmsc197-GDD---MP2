@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://cyxatyrapq250"]
 
 [ext_resource type="Script" uid="uid://rwu1opexsj8d" path="res://scenes/player/player.gd" id="1_cqiqx"]
+[ext_resource type="PackedScene" uid="uid://dgikx8u826ng7" path="res://scenes/stages/hud.tscn" id="2_p47bc"]
 [ext_resource type="Script" uid="uid://d0injnhv64s4a" path="res://scripts/state_machine.gd" id="2_vmepk"]
 [ext_resource type="Texture2D" uid="uid://joie7qrccm4b" path="res://assets/succubus/succubus_player.png" id="3_gmlin"]
 [ext_resource type="Shader" uid="uid://c6ta0bvb2af07" path="res://scenes/player/censor.gdshader" id="4_lvxji"]
@@ -161,6 +162,8 @@ level_threshold = Dictionary[int, float]({
 })
 metadata/_edit_group_ = true
 
+[node name="HUD" parent="." unique_id=948591641 instance=ExtResource("2_p47bc")]
+
 [node name="StateMachine" type="Node" parent="." unique_id=520582749]
 script = ExtResource("2_vmepk")
 
@@ -235,6 +238,9 @@ offset_bottom = 16.0
 grow_horizontal = 2
 grow_vertical = 2
 
+[connection signal="player_dead" from="." to="." method="_on_player_dead"]
+[connection signal="level_upped" from="." to="HUD" method="play_level_up"]
+[connection signal="xp_changed" from="." to="HUD" method="update_player_ui"]
 [connection signal="timeout" from="DemonTimer" to="." method="end_demon_time"]
 [connection signal="body_entered" from="Charm" to="." method="_on_charm" binds= [true]]
 [connection signal="body_exited" from="Charm" to="." method="_on_charm" binds= [false]]
