@@ -1,0 +1,137 @@
+[gd_scene format=3 uid="uid://cyxatyrapq250"]
+
+[ext_resource type="Script" uid="uid://rwu1opexsj8d" path="res://revised/player/player.gd" id="1_cqiqx"]
+[ext_resource type="Texture2D" uid="uid://dcwja301mrl4e" path="res://assets/player_sheet.png" id="1_xc6nl"]
+[ext_resource type="Script" uid="uid://d0injnhv64s4a" path="res://revised/state_machine.gd" id="2_vmepk"]
+
+[sub_resource type="Animation" id="Animation_vmepk"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [7]
+}
+
+[sub_resource type="Animation" id="Animation_8yqb7"]
+resource_name = "feed"
+length = 0.2
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [3, 4]
+}
+
+[sub_resource type="Animation" id="Animation_q4x0c"]
+resource_name = "idle"
+length = 0.4
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.4),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [7, 10]
+}
+
+[sub_resource type="Animation" id="Animation_paujj"]
+resource_name = "run"
+length = 0.5
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [13, 18]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_paujj"]
+_data = {
+&"RESET": SubResource("Animation_vmepk"),
+&"feed": SubResource("Animation_8yqb7"),
+&"idle": SubResource("Animation_q4x0c"),
+&"run": SubResource("Animation_paujj")
+}
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_cqiqx"]
+radius = 7.0
+height = 22.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_vmepk"]
+radius = 40.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_paujj"]
+radius = 48.50258
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_q4x0c"]
+radius = 23.086792
+
+[node name="Player" type="CharacterBody2D" unique_id=1043865114]
+scale = Vector2(2, 2)
+collision_mask = 14
+motion_mode = 1
+script = ExtResource("1_cqiqx")
+
+[node name="StateMachine" type="Node" parent="." unique_id=520582749]
+script = ExtResource("2_vmepk")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=474085319]
+libraries/ = SubResource("AnimationLibrary_paujj")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1088635542]
+position = Vector2(0, -4)
+texture = ExtResource("1_xc6nl")
+hframes = 19
+frame = 7
+
+[node name="Collider" type="CollisionShape2D" parent="." unique_id=906811026]
+shape = SubResource("CapsuleShape2D_cqiqx")
+debug_color = Color(0.5732935, 0.5551327, 7.70092e-07, 0.41960785)
+
+[node name="CharmZone" type="Area2D" parent="." unique_id=206353401]
+collision_mask = 4
+
+[node name="Zone" type="CollisionShape2D" parent="CharmZone" unique_id=1810405804]
+shape = SubResource("CircleShape2D_vmepk")
+disabled = true
+debug_color = Color(0.6513012, 0.45212996, 0.679536, 0.41960785)
+
+[node name="ChaseZone" type="Area2D" parent="." unique_id=1739261097]
+
+[node name="Zone" type="CollisionShape2D" parent="ChaseZone" unique_id=1555590754]
+shape = SubResource("CircleShape2D_paujj")
+debug_color = Color(0.7370261, 0.45492512, 0.30199704, 0.41960785)
+
+[node name="FeedZone" type="Area2D" parent="." unique_id=1043059715]
+collision_mask = 12
+
+[node name="Zone" type="CollisionShape2D" parent="FeedZone" unique_id=1259946591]
+shape = SubResource("CircleShape2D_q4x0c")
+
+[connection signal="mouse_exited" from="ChaseZone" to="." method="mouse_detect" binds= [false]]
+[connection signal="mouse_entered" from="FeedZone" to="." method="mouse_detect" binds= [true]]

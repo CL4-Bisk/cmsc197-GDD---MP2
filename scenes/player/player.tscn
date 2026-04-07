@@ -1,0 +1,283 @@
+[gd_scene format=3 uid="uid://cyxatyrapq250"]
+
+[ext_resource type="Script" uid="uid://rwu1opexsj8d" path="res://scenes/player/player.gd" id="1_cqiqx"]
+[ext_resource type="PackedScene" uid="uid://dgikx8u826ng7" path="res://scenes/stages/hud.tscn" id="2_p47bc"]
+[ext_resource type="Script" uid="uid://d0injnhv64s4a" path="res://scripts/state_machine.gd" id="2_vmepk"]
+[ext_resource type="Texture2D" uid="uid://joie7qrccm4b" path="res://assets/succubus/succubus_player.png" id="3_gmlin"]
+[ext_resource type="Shader" uid="uid://c6ta0bvb2af07" path="res://scenes/player/censor.gdshader" id="4_lvxji"]
+
+[sub_resource type="Animation" id="Animation_gmlin"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0]
+}
+
+[sub_resource type="Animation" id="Animation_75vfm"]
+resource_name = "dead"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.15, 0.3, 1),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [36, 38, 37, 45]
+}
+
+[sub_resource type="Animation" id="Animation_0owmy"]
+resource_name = "hit"
+length = 0.6
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.6),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [30, 36]
+}
+
+[sub_resource type="Animation" id="Animation_lvxji"]
+resource_name = "idle"
+length = 0.6
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.6),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0, 6]
+}
+
+[sub_resource type="Animation" id="Animation_qek5x"]
+resource_name = "idle_demon"
+length = 0.6
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.6),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [7, 13]
+}
+
+[sub_resource type="Animation" id="Animation_p47bc"]
+resource_name = "run"
+length = 0.6
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.6),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [14, 21]
+}
+
+[sub_resource type="Animation" id="Animation_5gtgg"]
+resource_name = "run_demon"
+length = 0.6
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.6),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [22, 29]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_p47bc"]
+_data = {
+&"RESET": SubResource("Animation_gmlin"),
+&"dead": SubResource("Animation_75vfm"),
+&"hit": SubResource("Animation_0owmy"),
+&"idle": SubResource("Animation_lvxji"),
+&"idle_demon": SubResource("Animation_qek5x"),
+&"run": SubResource("Animation_p47bc"),
+&"run_demon": SubResource("Animation_5gtgg")
+}
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_cqiqx"]
+radius = 7.0
+height = 22.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_vmepk"]
+radius = 40.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_paujj"]
+radius = 48.50258
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_q4x0c"]
+radius = 32.0
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_p47bc"]
+shader = ExtResource("4_lvxji")
+shader_parameter/pixel_size = 70.0000032775
+
+[sub_resource type="Curve" id="Curve_p47bc"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="Gradient" id="Gradient_p47bc"]
+colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 1)
+
+[node name="Player" type="CharacterBody2D" unique_id=1043865114]
+z_index = -1
+collision_mask = 14
+motion_mode = 1
+script = ExtResource("1_cqiqx")
+level_threshold = Dictionary[int, float]({
+0: 0.0,
+1: 30.0,
+2: 150.0,
+3: 500.0,
+4: 1000.0
+})
+popup_text = ExtResource("2_p47bc")
+metadata/_edit_group_ = true
+
+[node name="HUD" parent="." unique_id=948591641 instance=ExtResource("2_p47bc")]
+
+[node name="StateMachine" type="Node" parent="." unique_id=520582749]
+script = ExtResource("2_vmepk")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=761262257]
+texture = ExtResource("3_gmlin")
+hframes = 7
+vframes = 7
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=2133244995]
+libraries/ = SubResource("AnimationLibrary_p47bc")
+
+[node name="Nav2D" type="NavigationObstacle2D" parent="." unique_id=1563589754]
+visible = false
+radius = 5.0
+affect_navigation_mesh = true
+carve_navigation_mesh = true
+
+[node name="DemonTimer" type="Timer" parent="." unique_id=1676745639]
+wait_time = 10.0
+one_shot = true
+
+[node name="IFrameTimer" type="Timer" parent="." unique_id=191857992]
+
+[node name="StarveTimer" type="Timer" parent="." unique_id=1894557622]
+wait_time = 0.1
+
+[node name="HitBox" type="CollisionShape2D" parent="." unique_id=906811026]
+z_index = 2
+shape = SubResource("CapsuleShape2D_cqiqx")
+debug_color = Color(0.5732935, 0.5551327, 7.70092e-07, 0.41960785)
+
+[node name="Charm" type="Area2D" parent="." unique_id=206353401]
+show_behind_parent = true
+z_index = 1
+collision_mask = 4
+
+[node name="Zone" type="CollisionShape2D" parent="Charm" unique_id=1810405804]
+shape = SubResource("CircleShape2D_vmepk")
+disabled = true
+debug_color = Color(1, 0.5378147, 0.8082103, 0.34117648)
+
+[node name="Chase" type="Area2D" parent="." unique_id=1739261097]
+collision_mask = 2
+monitorable = false
+
+[node name="Zone" type="CollisionShape2D" parent="Chase" unique_id=1555590754]
+z_index = -1
+shape = SubResource("CircleShape2D_paujj")
+debug_color = Color(1, 1, 1, 0.05490196)
+
+[node name="Feed" type="Area2D" parent="." unique_id=1043059715 groups=["succubus"]]
+collision_mask = 12
+monitorable = false
+
+[node name="Zone" type="CollisionShape2D" parent="Feed" unique_id=1259946591]
+z_index = 1
+shape = SubResource("CircleShape2D_q4x0c")
+debug_color = Color(0.7770559, 0.42953065, 0.26532078, 0.28235295)
+
+[node name="Check" type="RayCast2D" parent="." unique_id=943925329]
+collision_mask = 2
+
+[node name="Censor" type="ColorRect" parent="." unique_id=1572261174]
+visible = false
+z_index = 10
+material = SubResource("ShaderMaterial_p47bc")
+clip_contents = true
+custom_minimum_size = Vector2(32, 32)
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -16.0
+offset_top = -16.0
+offset_right = 16.0
+offset_bottom = 16.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CharmAura" type="CPUParticles2D" parent="." unique_id=2017985521]
+z_index = -1
+emitting = false
+amount = 60
+speed_scale = 0.4
+explosiveness = 0.1
+randomness = 0.5
+spread = 180.0
+gravity = Vector2(0, -1)
+initial_velocity_min = 60.0
+initial_velocity_max = 60.0
+scale_amount_max = 10.0
+scale_amount_curve = SubResource("Curve_p47bc")
+color = Color(1, 0.2509804, 0.33333334, 1)
+color_ramp = SubResource("Gradient_p47bc")
+hue_variation_min = -1.0
+hue_variation_max = 1.0
+
+[node name="Status" type="Label" parent="." unique_id=1845138907]
+offset_right = 40.0
+offset_bottom = 23.0
+
+[connection signal="player_dead" from="." to="." method="_on_player_dead"]
+[connection signal="timeout" from="DemonTimer" to="." method="end_demon_time"]
+[connection signal="timeout" from="IFrameTimer" to="." method="invul" binds= [false]]
+[connection signal="body_entered" from="Charm" to="." method="_on_charm" binds= [true]]
+[connection signal="body_exited" from="Charm" to="." method="_on_charm" binds= [false]]
+[connection signal="mouse_exited" from="Chase" to="." method="mouse_detect" binds= [false]]
+[connection signal="mouse_entered" from="Feed" to="." method="mouse_detect" binds= [true]]

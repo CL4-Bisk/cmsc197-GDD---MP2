@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://ullhdpquvp0e"]
+
+[ext_resource type="Script" uid="uid://d4jbeyjdliutl" path="res://scenes/popup.gd" id="1_4ebxx"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_4ebxx"]
+font_size = 8
+
+[node name="Label" type="Label" unique_id=1296107037]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "sample text"
+label_settings = SubResource("LabelSettings_4ebxx")
+script = ExtResource("1_4ebxx")
+duration = 0.4

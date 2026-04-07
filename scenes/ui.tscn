@@ -1,0 +1,142 @@
+[gd_scene format=3 uid="uid://qot015wf8xmu"]
+
+[ext_resource type="Script" uid="uid://cwj5p6gv7yewu" path="res://ui.gd" id="1_nt7q6"]
+[ext_resource type="AudioStream" uid="uid://c3wbsrwjjcymd" path="res://assets/audio/theboysbeats-the-boy-s-beats-top-gear-2025-283029.mp3" id="2_x4jx1"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_nt7q6"]
+font_size = 80
+
+[node name="UI" type="CanvasLayer" unique_id=1625433607]
+script = ExtResource("1_nt7q6")
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="." unique_id=1589576402]
+stream = ExtResource("2_x4jx1")
+
+[node name="GameOverScreen" type="MarginContainer" parent="." unique_id=855607099]
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -576.0
+offset_top = -11.5
+offset_right = 576.0
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBox" type="VBoxContainer" parent="GameOverScreen" unique_id=1716218524]
+layout_mode = 2
+
+[node name="Message" type="Label" parent="GameOverScreen/VBox" unique_id=691581953]
+layout_mode = 2
+text = "GAME OVER"
+label_settings = SubResource("LabelSettings_nt7q6")
+horizontal_alignment = 1
+
+[node name="Button" type="Button" parent="GameOverScreen/VBox" unique_id=828632965]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+text = "Play Again"
+
+[node name="TitleScreen" type="MarginContainer" parent="." unique_id=1048430859]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -576.0
+offset_top = -11.5
+offset_right = 576.0
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBox" type="VBoxContainer" parent="TitleScreen" unique_id=1079633132]
+layout_mode = 2
+
+[node name="Message" type="Label" parent="TitleScreen/VBox" unique_id=1700001454]
+layout_mode = 2
+text = "Lustbound
+(thot sim scuffed ver)"
+label_settings = SubResource("LabelSettings_nt7q6")
+horizontal_alignment = 1
+
+[node name="Button" type="Button" parent="TitleScreen/VBox" unique_id=1790681816]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+text = "Start Game"
+
+[node name="GameInfo" type="MarginContainer" parent="." unique_id=1646262520]
+visible = false
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="GameInfo" unique_id=1925335597]
+layout_mode = 2
+
+[node name="H1" type="HBoxContainer" parent="GameInfo/VBoxContainer" unique_id=1790790389]
+layout_mode = 2
+
+[node name="LifeforceGathered" type="Label" parent="GameInfo/VBoxContainer/H1" unique_id=1472815065]
+layout_mode = 2
+text = "Lifeforce Gathered: "
+
+[node name="Value" type="Label" parent="GameInfo/VBoxContainer/H1" unique_id=776602811]
+layout_mode = 2
+text = "00000"
+vertical_alignment = 1
+
+[node name="H2" type="HBoxContainer" parent="GameInfo/VBoxContainer" unique_id=1794276944]
+layout_mode = 2
+
+[node name="Level" type="Label" parent="GameInfo/VBoxContainer/H2" unique_id=1151252636]
+layout_mode = 2
+text = "Level"
+
+[node name="Value" type="Label" parent="GameInfo/VBoxContainer/H2" unique_id=358161072]
+layout_mode = 2
+text = "00000"
+vertical_alignment = 1
+
+[node name="H3" type="HBoxContainer" parent="GameInfo/VBoxContainer" unique_id=1524315800]
+layout_mode = 2
+
+[node name="ThotPower" type="Label" parent="GameInfo/VBoxContainer/H3" unique_id=427610421]
+layout_mode = 2
+text = "Power of Thot:"
+
+[node name="Value" type="Label" parent="GameInfo/VBoxContainer/H3" unique_id=454669002]
+layout_mode = 2
+text = "00000"
+vertical_alignment = 1
+
+[node name="H4" type="HBoxContainer" parent="GameInfo/VBoxContainer" unique_id=1805985154]
+layout_mode = 2
+
+[node name="Hint" type="Label" parent="GameInfo/VBoxContainer/H4" unique_id=618065232]
+layout_mode = 2
+text = "Lifeforce to next level: "
+
+[node name="Value" type="Label" parent="GameInfo/VBoxContainer/H4" unique_id=1845554072]
+layout_mode = 2
+text = "00000"
+vertical_alignment = 1
+
+[node name="H5" type="HBoxContainer" parent="GameInfo/VBoxContainer" unique_id=1718128258]
+layout_mode = 2
+
+[node name="Lives" type="Label" parent="GameInfo/VBoxContainer/H5" unique_id=1307088665]
+layout_mode = 2
+text = "Lives:"
+
+[node name="Value" type="Label" parent="GameInfo/VBoxContainer/H5" unique_id=233195380]
+layout_mode = 2
+text = "00000"
+vertical_alignment = 1
+
+[connection signal="pressed" from="GameOverScreen/VBox/Button" to="." method="new_game_pressed"]
+[connection signal="pressed" from="TitleScreen/VBox/Button" to="." method="start_game_pressed"]
